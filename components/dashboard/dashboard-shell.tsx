@@ -55,6 +55,9 @@ const tools: Tool[] = [
   { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.svg', keywords: 'batch bulk production names numbers quantity list', icon: Layers3 },
   { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.svg', keywords: 'export package svg ai eps pdf png production files', icon: PackageOpen },
   { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.svg', keywords: 'order sheet production list quantity sizes names', icon: FileCog },
+  { title: 'Manual Vector Tracing', href: '/manual-vector-tracing', image: '/dashboard/tools/manual-vector-tracing.svg', keywords: 'manual vector trace pen bezier paths nodes artwork', icon: SquarePen },
+  { title: 'Colour Editor', href: '/colour-editor', image: '/dashboard/tools/colour-editor.svg', keywords: 'colour color palette recolor fill stroke jersey', icon: Layers3 },
+  { title: 'Manual Production / Cut Setup', href: '/manual-production-cut-setup', image: '/dashboard/tools/manual-production-cut-setup.svg', keywords: 'manual production cut setup panels sublimation cut lines layout', icon: FileImage },
 ];
 
 const sidebarPrimary = [
@@ -73,6 +76,9 @@ const sidebarSecondary = [
   { label: 'BatchForge', href: '/batchforge', icon: Layers3 },
   { label: 'ExportPack', href: '/exportpack', icon: PackageOpen },
   { label: 'OrderSheet', href: '/ordersheet', icon: FileCog },
+  { label: 'Manual Vector Tracing', href: '/manual-vector-tracing', icon: SquarePen },
+  { label: 'Colour Editor', href: '/colour-editor', icon: Layers3 },
+  { label: 'Manual Production / Cut Setup', href: '/manual-production-cut-setup', icon: FileImage },
   { label: 'Topup AI Credits', href: '/topup-ai-credits', icon: Coins },
   { label: 'Settings', href: '/settings', icon: Settings },
   { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
@@ -501,6 +507,9 @@ function HamburgerMenu({
                 ['BatchForge', '/batchforge', Layers3],
                 ['ExportPack', '/exportpack', PackageOpen],
                 ['OrderSheet', '/ordersheet', FileCog],
+                ['Manual Vector Tracing', '/manual-vector-tracing', SquarePen],
+                ['Colour Editor', '/colour-editor', Layers3],
+                ['Manual Production / Cut Setup', '/manual-production-cut-setup', FileImage],
                 ['My Library', '/projects', ImageIcon],
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],

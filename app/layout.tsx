@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StudioSessionProvider } from "@/components/auth/studio-session";
 
 export const metadata: Metadata = {
   title: "My Jersey Studio — Production Workspace",
@@ -17,7 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <StudioSessionProvider>{children}</StudioSessionProvider>
+      </body>
     </html>
   );
 }

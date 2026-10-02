@@ -1,50 +1,61 @@
-﻿import type { ComponentType, ReactNode } from 'react';
+'use client';
+
+import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   Bot,
   ChevronDown,
   CircleHelp,
+  Cloud,
+  Crown,
+  FileCog,
+  FileImage,
   FolderOpen,
   Globe,
   Home,
   Image as ImageIcon,
   Layers3,
+  LogIn,
+  LogOut,
   Menu,
-  MoonStar,
-  PencilRuler,
+  Moon,
+  PackageOpen,
   Plus,
   Search,
   Settings,
   ShieldCheck,
   Sparkles,
   SquarePen,
-  Zap,
-  ArrowRight,
-  FileCog,
-  PackageOpen,
-  Crown,
-  SunMedium,
+  Sun,
+  UserRound,
+  X,
 } from 'lucide-react';
+import { useStudioSession } from '@/components/auth/studio-session';
 
-type NavItem = {
-  label: string;
-  href: string;
-  icon: ComponentType<{ className?: string }>;
-  active?: boolean;
-};
-
-type ToolItem = {
+type Tool = {
   title: string;
   href: string;
-  description: string;
+  image: string;
+  keywords: string;
   icon: ComponentType<{ className?: string }>;
-  accent: string;
-  panel: string;
-  art: ReactNode;
 };
 
-const primaryNav: NavItem[] = [
-  { label: 'Dashboard', href: '/', icon: Home, active: true },
+const tools: Tool[] = [
+  { title: 'Image to Vector', href: '/image-to-vector', image: '/dashboard/tools/image-to-vector.png', keywords: 'vector image jersey production', icon: ImageIcon },
+  { title: 'Oneclick Creation', href: '/oneclick-creation', image: '/dashboard/tools/oneclick-creation.png', keywords: 'automatic one click layout', icon: Sparkles },
+  { title: 'File Converter', href: '/file-converter', image: '/dashboard/tools/file-converter.png', keywords: 'svg png pdf ai eps jpg convert', icon: FileCog },
+  { title: 'Edit Existing File', href: '/edit-existing-file', image: '/dashboard/tools/edit-existing-file.png', keywords: 'edit modify customize', icon: SquarePen },
+  { title: 'Fallback Backup', href: '/backup', image: '/dashboard/tools/fallback-backup.png', keywords: 'backup restore cloud recover', icon: ShieldCheck },
+  { title: 'Mockup Generator', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: '2d 3d mockup preview', icon: PackageOpen },
+  { title: 'Templates', href: '/templates', image: '/dashboard/tools/templates.png', keywords: 'ready made jersey templates', icon: FileImage },
+  { title: 'Design Elements', href: '/design-elements', image: '/dashboard/tools/design-elements.png', keywords: 'logos fonts shapes patterns', icon: Layers3 },
+  { title: 'AI Assistant', href: '/ai-assistant', image: '/dashboard/tools/ai-assistant.png', keywords: 'ai command assistant design', icon: Bot },
+  { title: 'My Projects', href: '/projects', image: '/dashboard/tools/my-projects.png', keywords: 'projects files recent saved', icon: FolderOpen },
+];
+
+const sidebarPrimary = [
+  { label: 'Dashboard', href: '/', icon: Home, public: true },
   { label: 'New Project', href: '/new-project', icon: Plus },
   { label: 'Image to Vector', href: '/image-to-vector', icon: ImageIcon },
   { label: 'Oneclick Creation', href: '/oneclick-creation', icon: Sparkles },
@@ -52,7 +63,7 @@ const primaryNav: NavItem[] = [
   { label: 'Edit Existing File', href: '/edit-existing-file', icon: SquarePen },
 ];
 
-const secondaryNav: NavItem[] = [
+const sidebarSecondary = [
   { label: 'My Projects', href: '/projects', icon: FolderOpen },
   { label: 'Mockup Generator', href: '/mockup-generator', icon: PackageOpen },
   { label: 'Design Elements', href: '/design-elements', icon: Layers3 },
@@ -61,507 +72,522 @@ const secondaryNav: NavItem[] = [
   { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
 ];
 
-const tools: ToolItem[] = [
-  {
-    title: 'Image To Vector',
-    href: '/image-to-vector',
-    description: 'Upload a jersey image and convert it into a cleaner, production-ready vector workflow.',
-    icon: Bot,
-    accent: 'from-violet-500/70 via-indigo-500/60 to-blue-500/50',
-    panel: 'border-violet-400/40',
-    art: <PanelBlueprintArt />,
-  },
-  {
-    title: 'Oneclick Creation',
-    href: '/oneclick-creation',
-    description: 'Auto-detect panels, prep layouts, and move faster from source image to editable output.',
-    icon: Zap,
-    accent: 'from-amber-500/70 via-orange-500/60 to-red-500/40',
-    panel: 'border-amber-400/40',
-    art: <JerseyDuoArt tone="warm" />,
-  },
-  {
-    title: 'File Converter',
-    href: '/file-converter',
-    description: 'Move between SVG, PNG, JPG, PDF, and EPS so your files are ready for production or preview.',
-    icon: FileCog,
-    accent: 'from-emerald-500/70 via-green-500/60 to-cyan-500/50',
-    panel: 'border-emerald-400/40',
-    art: <FormatTilesArt />,
-  },
-  {
-    title: 'Edit Existing File',
-    href: '/edit-existing-file',
-    description: 'Refine an existing jersey design, adjust artwork, and prepare the next export pass.',
-    icon: PencilRuler,
-    accent: 'from-fuchsia-500/70 via-pink-500/60 to-rose-500/40',
-    panel: 'border-fuchsia-400/40',
-    art: <EditStudioArt />,
-  },
-  {
-    title: 'Fallback Backup',
-    href: '/backup',
-    description: 'Keep a recovery layer for key project files so you can safely restore and continue working.',
-    icon: ShieldCheck,
-    accent: 'from-sky-500/70 via-blue-500/60 to-cyan-500/40',
-    panel: 'border-sky-400/40',
-    art: <BackupCloudArt />,
-  },
-];
-
 export function DashboardShell() {
+  const session = useStudioSession();
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem('mj_dashboard_theme');
+    if (saved === 'light' || saved === 'dark') setTheme(saved);
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('mj_dashboard_theme', theme);
+    document.documentElement.dataset.mjTheme = theme;
+  }, [theme]);
+
+  const dark = theme === 'dark';
+  const filteredTools = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return tools;
+    return tools.filter((tool) => `${tool.title} ${tool.keywords}`.toLowerCase().includes(q));
+  }, [query]);
+
+  const displayName = session.profile?.fullName || (session.authenticated ? 'masteradmin' : 'Guest');
+  const displayRole = session.profile?.role || (session.authenticated ? 'Profile setup' : 'Not signed in');
+  const initials = displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || 'MJ';
+
+  function featureClick(event: ReactMouseEvent<HTMLAnchorElement>, href: string) {
+    if (session.canAccessFeatures) return;
+    event.preventDefault();
+    session.requestAccess(href);
+  }
+
+  const pageClass = dark ? 'bg-[#020812] text-white' : 'bg-[#eef4fb] text-[#0a1728]';
+  const shellClass = dark ? 'border-white/10 bg-[#030b17]/96' : 'border-slate-200 bg-white/94';
+  const sideClass = dark ? 'border-white/10 bg-[linear-gradient(180deg,#030a13,#020711)]' : 'border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f5f8fc)]';
+  const muted = dark ? 'text-white/55' : 'text-slate-500';
+
   return (
-    <main className="min-h-screen bg-[#030b18] text-white">
-      <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(22,78,171,0.35),transparent_24%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.14),transparent_22%),linear-gradient(180deg,rgba(7,16,36,1),rgba(3,11,24,1))]" />
-        <div className="relative mx-auto flex min-h-screen max-w-[1720px] gap-6 px-4 py-4 sm:px-5 lg:px-6">
-          <aside className="hidden w-[290px] shrink-0 rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(3,9,20,0.98),rgba(3,8,17,0.92))] p-5 shadow-[0_30px_90px_rgba(0,0,0,0.45)] xl:block">
-            <BrandCard />
+    <main className={`min-h-screen transition-colors duration-300 ${pageClass}`}>
+      <div className="mx-auto flex min-h-screen max-w-[1920px]">
+        <aside className={`hidden w-[286px] shrink-0 border-r p-5 xl:block ${sideClass}`}>
+          <Brand dark={dark} />
+          <nav className="mt-7 space-y-1.5">
+            {sidebarPrimary.map((item) => (
+              <NavItem key={item.label} {...item} active={item.href === '/'} dark={dark} onFeatureClick={featureClick} />
+            ))}
+          </nav>
+          <div className={`my-5 h-px ${dark ? 'bg-white/10' : 'bg-slate-200'}`} />
+          <nav className="space-y-1.5">
+            {sidebarSecondary.map((item) => (
+              <NavItem key={item.label} {...item} dark={dark} onFeatureClick={featureClick} />
+            ))}
+          </nav>
 
-            <nav className="mt-8 space-y-2">
-              {primaryNav.map((item) => (
-                <SidebarItem key={item.label} {...item} />
-              ))}
-            </nav>
+          <a
+            href="/upgrade"
+            onClick={(event) => featureClick(event, '/upgrade')}
+            className={`mt-7 block rounded-[22px] border p-4 transition hover:-translate-y-0.5 ${
+              dark
+                ? 'border-amber-400/30 bg-[linear-gradient(180deg,rgba(110,67,4,.30),rgba(65,41,4,.18))]'
+                : 'border-amber-300 bg-amber-50'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <Crown className="mt-0.5 h-6 w-6 text-amber-400" />
+              <div>
+                <div className="font-bold">Upgrade to Pro</div>
+                <div className={`mt-1 text-sm leading-5 ${muted}`}>Premium export and workflow options.</div>
+              </div>
+            </div>
+          </a>
+        </aside>
 
-            <div className="my-6 h-px bg-white/10" />
-
-            <nav className="space-y-2">
-              {secondaryNav.map((item) => (
-                <SidebarItem key={item.label} {...item} />
-              ))}
-            </nav>
-
-            <div className="mt-8 rounded-[22px] border border-amber-400/35 bg-[linear-gradient(180deg,rgba(126,74,7,0.30),rgba(84,52,12,0.18))] p-4 shadow-[0_16px_50px_rgba(0,0,0,0.25)]">
-              <div className="flex items-start gap-3">
-                <div className="rounded-2xl bg-amber-400/15 p-3 text-amber-300">
-                  <Crown className="h-6 w-6" />
-                </div>
-                <div>
-                  <p className="text-xl font-semibold">Upgrade to Pro</p>
-                  <p className="mt-1 text-sm leading-6 text-white/70">
-                    Unlock premium tools, advanced exports, and more powerful AI-driven workflows.
-                  </p>
+        <section className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
+          <div className={`min-h-[calc(100vh-24px)] rounded-[30px] border p-4 shadow-[0_28px_100px_rgba(0,0,0,.16)] sm:p-5 lg:p-6 ${shellClass}`}>
+            <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <button
+                  onClick={() => setMenuOpen(true)}
+                  className={`grid h-13 w-13 shrink-0 place-items-center rounded-2xl border transition hover:-translate-y-0.5 ${
+                    dark ? 'border-sky-400/25 bg-[#07172b] text-sky-300' : 'border-sky-200 bg-sky-50 text-sky-600'
+                  }`}
+                  aria-label="Open hamburger menu"
+                >
+                  <Menu className="h-6 w-6" />
+                </button>
+                <div className="relative w-full max-w-[580px]">
+                  <Search className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${muted}`} />
+                  <input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search tools, projects, templates..."
+                    className={`h-13 w-full rounded-2xl border pl-12 pr-4 text-sm outline-none transition focus:border-sky-400/50 ${
+                      dark ? 'border-white/10 bg-white/[0.04] text-white placeholder:text-white/35' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400'
+                    }`}
+                  />
                 </div>
               </div>
-              <a
-                href="/upgrade"
-                className="mt-4 inline-flex w-full items-center justify-between rounded-2xl border border-amber-300/30 bg-white/5 px-4 py-3 text-sm font-medium text-white transition hover:bg-white/10"
-              >
-                View plans
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
-          </aside>
 
-          <section className="min-w-0 flex-1 rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(4,11,23,0.86),rgba(2,7,16,0.88))] p-4 shadow-[0_30px_100px_rgba(0,0,0,0.28)] sm:p-5 lg:p-6">
-            <TopBar />
-            <HeroBanner />
-            <ToolSection />
-            <RecentProjectsSection />
-          </section>
-        </div>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                <div className={`inline-flex rounded-2xl border p-1 ${dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-slate-50'}`}>
+                  <button
+                    onClick={() => setTheme('light')}
+                    className={`grid h-10 w-10 place-items-center rounded-xl transition ${!dark ? 'bg-[#0875ff] text-white shadow-lg' : muted}`}
+                    aria-label="Light mode"
+                  >
+                    <Sun className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => setTheme('dark')}
+                    className={`grid h-10 w-10 place-items-center rounded-xl transition ${dark ? 'bg-[#0875ff] text-white shadow-lg' : muted}`}
+                    aria-label="Dark mode"
+                  >
+                    <Moon className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setLanguageOpen((open) => !open)}
+                    className={`inline-flex h-12 items-center gap-2 rounded-2xl border px-4 text-sm font-semibold ${
+                      dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'
+                    }`}
+                  >
+                    <Globe className="h-4 w-4" /> English <ChevronDown className="h-4 w-4" />
+                  </button>
+                  {languageOpen ? (
+                    <div className={`absolute right-0 top-14 z-30 w-44 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
+                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">English</button>
+                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">বাংলা</button>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setNotificationsOpen((open) => !open)}
+                    className={`relative grid h-12 w-12 place-items-center rounded-2xl border ${dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'}`}
+                    aria-label="Notifications"
+                  >
+                    <Bell className="h-5 w-5" />
+                  </button>
+                  {notificationsOpen ? (
+                    <div className={`absolute right-0 top-14 z-30 w-72 rounded-2xl border p-4 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
+                      <div className="font-semibold">Notifications</div>
+                      <div className={`mt-2 text-sm ${muted}`}>No notifications yet.</div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileOpen((open) => !open)}
+                    className={`flex h-12 items-center gap-3 rounded-2xl border px-2.5 pr-3 ${
+                      dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'
+                    }`}
+                  >
+                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[linear-gradient(135deg,#164d90,#0b8dff)] text-sm font-bold text-white">{initials}</span>
+                    <span className="hidden text-left sm:block">
+                      <span className="block max-w-[145px] truncate text-sm font-semibold">{displayName}</span>
+                      <span className={`block max-w-[145px] truncate text-[11px] ${muted}`}>{displayRole}</span>
+                    </span>
+                    <ChevronDown className="h-4 w-4 opacity-60" />
+                  </button>
+                  {profileOpen ? (
+                    <div className={`absolute right-0 top-14 z-30 w-64 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
+                      {session.authenticated ? (
+                        <>
+                          {!session.profile ? (
+                            <button onClick={() => session.openProfile()} className="w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-sky-500/10">
+                              Complete profile
+                            </button>
+                          ) : null}
+                          <button onClick={() => void session.logout()} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-red-400 hover:bg-red-500/10">
+                            <LogOut className="h-4 w-4" /> Logout
+                          </button>
+                        </>
+                      ) : (
+                        <button onClick={() => session.openLogin()} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-sky-500/10">
+                          <LogIn className="h-4 w-4" /> Login
+                        </button>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </header>
+
+            <section
+              className="relative mt-5 min-h-[330px] overflow-hidden rounded-[30px] border border-sky-400/15 bg-cover bg-center shadow-[0_24px_80px_rgba(0,0,0,.25)] sm:min-h-[370px]"
+              style={{ backgroundImage: "url('/dashboard/hero-stadium.png')" }}
+            >
+              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(1,8,19,.96)_0%,rgba(2,11,25,.86)_34%,rgba(2,11,25,.30)_64%,rgba(2,11,25,.12)_100%)]" />
+              <div className="relative z-10 max-w-[690px] p-7 sm:p-9 lg:p-11">
+                <p className="text-xl italic text-white/90">Welcome To</p>
+                <h1 className="mt-1 text-5xl font-black uppercase leading-[0.9] tracking-[0.03em] text-white sm:text-6xl lg:text-7xl">
+                  My Jersey
+                  <span className="mt-2 block bg-[linear-gradient(90deg,#e8f3ff,#2f91ff,#53c4ff)] bg-clip-text text-transparent">Studio</span>
+                </h1>
+                <div className="mt-5 h-1.5 w-36 rounded-full bg-[linear-gradient(90deg,#1ec8ff,#1977ff)]" />
+                <p className="mt-5 max-w-[610px] text-base leading-7 text-white/82 sm:text-lg">
+                  Turn any jersey into a production-ready design — upload, vectorize, customize, preview, and download.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.17em] text-white/65 sm:text-sm">
+                  <span>Upload</span><span className="text-sky-400">•</span>
+                  <span>Vectorize</span><span className="text-sky-400">•</span>
+                  <span>Customize</span><span className="text-sky-400">•</span>
+                  <span>Preview</span><span className="text-sky-400">•</span>
+                  <span>Download</span>
+                </div>
+                <a
+                  href="/new-project"
+                  onClick={(event) => featureClick(event, '/new-project')}
+                  className="mt-7 inline-flex items-center gap-3 rounded-full bg-[linear-gradient(90deg,#0875ff,#1babff)] px-6 py-4 font-bold text-white shadow-[0_18px_35px_rgba(8,117,255,.30)]"
+                >
+                  <Plus className="h-5 w-5" /> New Project
+                </a>
+              </div>
+            </section>
+
+            <section className="mt-7">
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-black">Tools</h2>
+                  {query ? <p className={`mt-1 text-sm ${muted}`}>{filteredTools.length} matching tool{filteredTools.length === 1 ? '' : 's'}</p> : null}
+                </div>
+                <a href="/tools" onClick={(event) => featureClick(event, '/tools')} className="text-sm font-semibold text-sky-500">View All →</a>
+              </div>
+
+              {filteredTools.length ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+                  {filteredTools.map((tool) => (
+                    <a
+                      key={tool.href}
+                      href={tool.href}
+                      onClick={(event) => featureClick(event, tool.href)}
+                      className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
+                        dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
+                      }`}
+                    >
+                      <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <div className={`rounded-[24px] border border-dashed p-9 text-center ${dark ? 'border-white/10 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'}`}>
+                  <Search className="mx-auto h-8 w-8 text-sky-500" />
+                  <div className="mt-3 font-semibold">No matching tools</div>
+                  <button onClick={() => setQuery('')} className="mt-2 text-sm text-sky-500">Clear search</button>
+                </div>
+              )}
+            </section>
+
+            <section className="mt-7">
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-2xl font-black">Recent Projects</h2>
+                <a href="/projects" onClick={(event) => featureClick(event, '/projects')} className="text-sm font-semibold text-sky-500">View All →</a>
+              </div>
+              <div className={`rounded-[28px] border border-dashed p-8 text-center ${dark ? 'border-white/10 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'}`}>
+                <FolderOpen className="mx-auto h-10 w-10 text-sky-500" />
+                <h3 className="mt-4 text-xl font-bold">No projects yet</h3>
+                <p className={`mx-auto mt-2 max-w-xl text-sm leading-6 ${muted}`}>
+                  Your saved projects will appear here after you create or import your first design.
+                </p>
+                <a
+                  href="/new-project"
+                  onClick={(event) => featureClick(event, '/new-project')}
+                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#0875ff] px-5 py-3 text-sm font-bold text-white"
+                >
+                  <Plus className="h-4 w-4" /> Create First Project
+                </a>
+              </div>
+            </section>
+          </div>
+        </section>
       </div>
+
+      {menuOpen ? (
+        <HamburgerMenu
+          dark={dark}
+          displayName={displayName}
+          displayRole={displayRole}
+          initials={initials}
+          authenticated={session.authenticated}
+          profileReady={Boolean(session.profile)}
+          onClose={() => setMenuOpen(false)}
+          onFeatureClick={featureClick}
+          onLogin={() => {
+            setMenuOpen(false);
+            session.openLogin();
+          }}
+          onCompleteProfile={() => {
+            setMenuOpen(false);
+            session.openProfile();
+          }}
+          onLogout={() => void session.logout()}
+        />
+      ) : null}
     </main>
   );
 }
 
-function BrandCard() {
+function Brand({ dark }: { dark: boolean }) {
   return (
-    <div className="flex flex-col items-center rounded-[26px] border border-white/8 bg-[radial-gradient(circle_at_top,rgba(44,132,255,0.18),transparent_45%),linear-gradient(180deg,rgba(8,17,35,0.95),rgba(2,8,18,0.95))] px-5 py-6 text-center">
-      <div className="grid h-20 w-20 place-items-center rounded-[24px] border border-white/10 bg-white/[0.03] shadow-[inset_0_0_30px_rgba(37,99,235,0.18)]">
-        <div className="relative text-[2.6rem] font-black tracking-tight">
-          <span className="text-white">M</span>
-          <span className="-ml-1 text-[#1e90ff]">J</span>
-        </div>
+    <div className="flex items-center gap-3 px-2 py-2">
+      <div className={`grid h-14 w-14 place-items-center rounded-2xl border text-2xl font-black ${dark ? 'border-white/10 bg-white/[0.04]' : 'border-slate-200 bg-white'}`}>
+        <span>M<span className="text-[#0875ff]">J</span></span>
       </div>
-      <h1 className="mt-5 text-[2.2rem] font-black leading-none tracking-[0.06em]">MY JERSEY</h1>
-      <p className="mt-1 text-lg font-semibold tracking-[0.46em] text-[#1e90ff]">STUDIO</p>
+      <div>
+        <div className="text-lg font-black leading-none tracking-wide">MY JERSEY</div>
+        <div className="mt-1 text-xs font-bold tracking-[0.34em] text-[#0875ff]">STUDIO</div>
+      </div>
     </div>
   );
 }
 
-function SidebarItem({ label, href, icon: Icon, active }: NavItem) {
+function NavItem({
+  label,
+  href,
+  icon: Icon,
+  active,
+  public: isPublic,
+  dark,
+  onFeatureClick,
+}: {
+  label: string;
+  href: string;
+  icon: ComponentType<{ className?: string }>;
+  active?: boolean;
+  public?: boolean;
+  dark: boolean;
+  onFeatureClick: (event: ReactMouseEvent<HTMLAnchorElement>, href: string) => void;
+}) {
   return (
     <a
       href={href}
-      className={[
-        'group flex items-center gap-4 rounded-[18px] px-4 py-3 text-[1.05rem] transition',
+      onClick={isPublic ? undefined : (event) => onFeatureClick(event, href)}
+      className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-sm font-medium transition ${
         active
-          ? 'border border-sky-400/35 bg-[linear-gradient(90deg,rgba(16,94,194,0.62),rgba(8,33,64,0.40))] text-white shadow-[inset_0_0_0_1px_rgba(147,197,253,0.08)]'
-          : 'border border-transparent text-white/86 hover:border-white/10 hover:bg-white/[0.04] hover:text-white',
-      ].join(' ')}
+          ? 'border-sky-400/35 bg-[linear-gradient(90deg,rgba(8,117,255,.65),rgba(8,62,126,.48))] text-white'
+          : dark
+            ? 'border-transparent text-white/75 hover:border-white/10 hover:bg-white/[0.04] hover:text-white'
+            : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-950'
+      }`}
     >
-      <span
-        className={[
-          'grid h-11 w-11 place-items-center rounded-2xl border transition',
-          active
-            ? 'border-white/10 bg-white/10 text-white'
-            : 'border-white/8 bg-white/[0.03] text-white/75 group-hover:border-white/12 group-hover:text-white',
-        ].join(' ')}
-      >
-        <Icon className="h-5 w-5" />
+      <span className={`grid h-9 w-9 place-items-center rounded-xl ${dark ? 'bg-white/[0.04]' : 'bg-slate-100'}`}>
+        <Icon className="h-4.5 w-4.5" />
       </span>
-      <span className="truncate">{label}</span>
+      {label}
     </a>
   );
 }
 
-function TopBar() {
-  return (
-    <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex min-w-0 items-center gap-3">
-        <button className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white/80 xl:hidden">
-          <Menu className="h-5 w-5" />
-        </button>
-        <div className="relative min-w-0 flex-1 lg:w-[560px] lg:flex-none">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/45" />
-          <input
-            type="text"
-            placeholder="Search tools, projects, templates..."
-            className="h-14 w-full rounded-[22px] border border-white/10 bg-white/[0.04] pl-12 pr-4 text-[1rem] text-white outline-none ring-0 placeholder:text-white/35"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-end gap-3">
-        <div className="inline-flex rounded-[20px] border border-white/10 bg-white/[0.04] p-1.5">
-          <button className="inline-flex h-11 w-11 items-center justify-center rounded-2xl text-white/75 transition hover:bg-white/[0.06] hover:text-white">
-            <MoonStar className="h-5 w-5" />
-          </button>
-          <button className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f7bff] text-white shadow-[0_8px_20px_rgba(15,123,255,0.35)]">
-            <SunMedium className="h-5 w-5" />
-          </button>
-        </div>
-
-        <button className="inline-flex items-center gap-2 rounded-[20px] border border-white/10 bg-white/[0.04] px-4 py-3 text-sm font-medium text-white">
-          <Globe className="h-5 w-5 text-white/75" />
-          English
-          <ChevronDown className="h-4 w-4 text-white/60" />
-        </button>
-
-        <button className="relative inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white/80">
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-red-500 ring-4 ring-[#061325]" />
-        </button>
-
-        <button className="flex items-center gap-3 rounded-[22px] border border-white/10 bg-white/[0.04] px-3 py-2.5 text-left">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(135deg,#18467f,#0d89ff)] text-base font-semibold text-white shadow-[inset_0_0_18px_rgba(255,255,255,0.16)]">
-            TA
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-base font-semibold">The Artist</p>
-            <p className="text-sm text-white/60">Workspace</p>
-          </div>
-          <ChevronDown className="hidden h-4 w-4 text-white/50 sm:block" />
-        </button>
-      </div>
-    </header>
-  );
-}
-
-function HeroBanner() {
-  return (
-    <section className="relative mt-6 overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(135deg,rgba(4,12,28,0.95),rgba(8,20,47,0.90))] p-7 shadow-[0_24px_80px_rgba(0,0,0,0.30)] lg:p-9">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.24),transparent_24%),radial-gradient(circle_at_85%_10%,rgba(6,182,212,0.18),transparent_18%),radial-gradient(circle_at_50%_100%,rgba(14,165,233,0.18),transparent_25%)]" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.24))]" />
-
-      <div className="relative grid gap-8 xl:grid-cols-[1.08fr_0.92fr] xl:items-center">
-        <div className="max-w-[720px]">
-          <p className="text-xl italic tracking-wide text-white/85 md:text-2xl">Welcome To</p>
-          <h2 className="mt-2 text-5xl font-black uppercase leading-[0.88] tracking-[0.03em] text-white sm:text-6xl lg:text-7xl">
-            My Jersey
-            <span className="mt-2 block bg-[linear-gradient(90deg,#d4e7ff,#46a0ff,#68b6ff)] bg-clip-text text-transparent">
-              Studio
-            </span>
-          </h2>
-          <div className="mt-5 h-1.5 w-32 rounded-full bg-[linear-gradient(90deg,#12c2ff,#1d4ed8)]" />
-          <p className="mt-6 max-w-[620px] text-lg leading-8 text-white/80 sm:text-xl">
-            Turn any jersey into a production-ready design flow â€” upload, vectorize, customize, preview, and export from one unified workspace.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-sm font-medium uppercase tracking-[0.18em] text-white/65">
-            <span>Upload</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-            <span>Vectorize</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-            <span>Customize</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-            <span>Preview</span>
-            <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
-            <span>Download</span>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-4">
-            <a
-              href="/new-project"
-              className="inline-flex items-center gap-3 rounded-full bg-[linear-gradient(90deg,#0e76ff,#29a7ff)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_35px_rgba(14,118,255,0.32)] transition hover:translate-y-[-1px]"
-            >
-              <Plus className="h-5 w-5" />
-              New Project
-              <ArrowRight className="h-5 w-5" />
-            </a>
-          </div>
-        </div>
-
-        <div className="relative">
-          <div className="absolute right-0 top-0 hidden text-right text-2xl italic text-white/85 lg:block">
-            <p>Design</p>
-            <p>Your Passion</p>
-          </div>
-          <div className="relative flex min-h-[310px] items-end justify-center gap-3 sm:gap-4 lg:min-h-[360px] xl:justify-end">
-            <div className="absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.24),transparent_35%)] blur-2xl" />
-            <div className="relative translate-y-2 sm:translate-y-4"><HeroJerseyRed /></div>
-            <div className="relative z-10"><HeroJerseyBlue /></div>
-            <div className="relative translate-y-1 sm:translate-y-4"><HeroJerseyPurple /></div>
-            <div className="relative hidden translate-y-3 md:block"><HeroJerseyGold /></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ToolSection() {
-  return (
-    <section className="mt-7">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-2xl font-bold tracking-tight">Tools</h3>
-        <a href="/tools" className="inline-flex items-center gap-2 text-sm font-medium text-sky-400 transition hover:text-sky-300">
-          View All
-          <ArrowRight className="h-4 w-4" />
-        </a>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-        {tools.map((tool) => {
-          const Icon = tool.icon;
-          return (
-            <a
-              key={tool.title}
-              href={tool.href}
-              className={[
-                'group relative overflow-hidden rounded-[26px] border bg-[linear-gradient(180deg,rgba(6,15,31,0.96),rgba(6,13,24,0.96))] p-5 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(0,0,0,0.28)]',
-                tool.panel,
-              ].join(' ')}
-            >
-              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${tool.accent} opacity-85`} />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.18),transparent_18%),linear-gradient(180deg,rgba(255,255,255,0.04),transparent)]" />
-              <div className="relative flex h-full flex-col">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="grid h-14 w-14 place-items-center rounded-2xl border border-white/15 bg-white/[0.10] shadow-[inset_0_0_20px_rgba(255,255,255,0.10)]">
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="w-[92px] shrink-0">{tool.art}</div>
-                </div>
-                <h4 className="mt-5 text-[1.85rem] font-bold leading-tight tracking-tight text-white">
-                  {tool.title}
-                </h4>
-                <p className="mt-3 text-sm leading-6 text-white/85">{tool.description}</p>
-                <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white/95">
-                  Open tool
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-white/15 bg-white/[0.12] transition group-hover:translate-x-0.5">
-                    <ArrowRight className="h-4 w-4" />
-                  </span>
-                </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function RecentProjectsSection() {
-  return (
-    <section className="mt-7">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <h3 className="text-2xl font-bold tracking-tight">Recent Projects</h3>
-        <a href="/projects" className="inline-flex items-center gap-2 text-sm font-medium text-sky-400 transition hover:text-sky-300">
-          View All
-          <ArrowRight className="h-4 w-4" />
-        </a>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="col-span-full rounded-[26px] border border-dashed border-white/12 bg-white/[0.02] p-6 xl:col-span-3">
-          <div className="flex min-h-[250px] flex-col items-center justify-center rounded-[22px] border border-white/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01))] px-6 py-10 text-center">
-            <div className="grid h-20 w-20 place-items-center rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.22),transparent_65%),rgba(255,255,255,0.03)] text-sky-300">
-              <FolderOpen className="h-9 w-9" />
-            </div>
-            <h4 className="mt-5 text-2xl font-bold">No recent projects yet</h4>
-            <p className="mt-3 max-w-[620px] text-base leading-7 text-white/65">
-              Start your first project, import an existing jersey file, or run an image-to-vector flow. Your saved and recent designs will appear here automatically.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <a
-                href="/new-project"
-                className="inline-flex items-center gap-2 rounded-full bg-[linear-gradient(90deg,#0e76ff,#29a7ff)] px-5 py-3 text-sm font-semibold text-white shadow-[0_15px_30px_rgba(14,118,255,0.28)]"
-              >
-                <Plus className="h-4 w-4" />
-                Create New Project
-              </a>
-              <a
-                href="/image-to-vector"
-                className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-5 py-3 text-sm font-semibold text-white/85"
-              >
-                <ImageIcon className="h-4 w-4" />
-                Import Jersey Image
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <a
-          href="/new-project"
-          className="group rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(9,17,32,0.96),rgba(5,11,22,0.96))] p-5 transition hover:-translate-y-1 hover:border-sky-400/40"
-        >
-          <div className="flex h-full min-h-[250px] flex-col items-center justify-center rounded-[22px] border border-dashed border-white/14 bg-white/[0.02] text-center">
-            <span className="grid h-[4.5rem] w-[4.5rem] place-items-center rounded-full border border-white/12 bg-white/[0.03]">
-              <Plus className="h-10 w-10 text-white/80" />
-            </span>
-            <h4 className="mt-4 text-2xl font-semibold">New Project</h4>
-            <p className="mt-2 max-w-[220px] text-sm leading-6 text-white/60">
-              Launch a fresh jersey workflow from upload to vector and export.
-            </p>
-          </div>
-        </a>
-      </div>
-    </section>
-  );
-}
-
-function PanelBlueprintArt() {
-  return (
-    <svg viewBox="0 0 120 120" className="h-[92px] w-[92px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="8" y="8" width="104" height="104" rx="22" fill="rgba(0,0,0,0.16)" stroke="rgba(255,255,255,0.12)" />
-      <path d="M44 24L36 32L24 36V96H96V36L84 32L76 24H44Z" fill="rgba(35,112,255,0.18)" stroke="#D8E9FF" strokeWidth="2.4" />
-      <path d="M36 32L46 44M84 32L74 44M60 24V96" stroke="#8ED0FF" strokeWidth="2" strokeLinecap="round" />
-      <circle cx="60" cy="60" r="4" fill="#D8E9FF" />
-    </svg>
-  );
-}
-
-function JerseyDuoArt({ tone }: { tone: 'warm' | 'cool' }) {
-  const left = tone === 'warm' ? '#DC2626' : '#2563EB';
-  const right = tone === 'warm' ? '#111827' : '#0F172A';
-  const accent = tone === 'warm' ? '#FDBA74' : '#A5F3FC';
-
-  return (
-    <svg viewBox="0 0 150 120" className="h-[92px] w-[92px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M47 20L39 28L25 33V102H73V33L59 28L51 20H47Z" fill={left} opacity="0.96" />
-      <path d="M54 20L63 28L76 33V102H125V33L111 28L103 20H54Z" fill={right} opacity="0.96" />
-      <path d="M34 53H64M89 53H117" stroke={accent} strokeWidth="3" strokeLinecap="round" opacity="0.9" />
-      <path d="M42 20H56M94 20H109" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" opacity="0.95" />
-    </svg>
-  );
-}
-
-function FormatTilesArt() {
-  const tiles = [
-    { x: 0, y: 0, label: 'SVG' },
-    { x: 38, y: 0, label: 'PNG' },
-    { x: 76, y: 0, label: 'JPG' },
-    { x: 19, y: 38, label: 'PDF' },
-    { x: 57, y: 38, label: 'EPS' },
-  ];
-
-  return (
-    <svg viewBox="0 0 120 120" className="h-[92px] w-[92px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {tiles.map((tile, idx) => (
-        <g key={idx} transform={`translate(${tile.x + 10} ${tile.y + 16})`}>
-          <rect width="30" height="30" rx="8" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.25)" />
-          <text x="15" y="18" textAnchor="middle" fontSize="10" fontWeight="700" fill="#ffffff">
-            {tile.label}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-}
-
-function EditStudioArt() {
-  return (
-    <svg viewBox="0 0 120 120" className="h-[92px] w-[92px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="10" y="20" width="100" height="70" rx="14" fill="rgba(0,0,0,0.18)" stroke="rgba(255,255,255,0.16)" />
-      <rect x="18" y="30" width="40" height="10" rx="5" fill="rgba(255,255,255,0.12)" />
-      <rect x="18" y="46" width="56" height="8" rx="4" fill="rgba(255,255,255,0.12)" />
-      <rect x="18" y="60" width="34" height="8" rx="4" fill="rgba(255,255,255,0.12)" />
-      <path d="M82 35L71 46V77H102V35H82Z" fill="#171f39" stroke="#F9A8D4" strokeWidth="2" />
-      <path d="M71 46L82 35" stroke="#F9A8D4" strokeWidth="2" />
-      <path d="M83 56L92 47L100 55" stroke="#F472B6" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="91" cy="66" r="8" fill="#EC4899" opacity="0.85" />
-    </svg>
-  );
-}
-
-function BackupCloudArt() {
-  return (
-    <svg viewBox="0 0 120 120" className="h-[92px] w-[92px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M41 87H81C94 87 103 79 103 67C103 56 96 48 85 47C81 34 72 27 60 27C48 27 39 34 35 46C23 47 14 55 14 67C14 79 23 87 37 87H41Z" fill="rgba(255,255,255,0.12)" stroke="#D6F0FF" strokeWidth="2.5" />
-      <path d="M60 75V53" stroke="#D6F0FF" strokeWidth="3" strokeLinecap="round" />
-      <path d="M51 61L60 52L69 61" stroke="#D6F0FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M76 78L82 84L95 71" stroke="#8FE0FF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function HeroJerseyRed() {
-  return <HeroJersey colorA="#D61F3D" colorB="#F97316" number="07" side="left" />;
-}
-
-function HeroJerseyBlue() {
-  return <HeroJersey colorA="#ffffff" colorB="#6EC1FF" number="10" centerStripe />;
-}
-
-function HeroJerseyPurple() {
-  return <HeroJersey colorA="#3B1A75" colorB="#7C3AED" number="18" side="right" />;
-}
-
-function HeroJerseyGold() {
-  return <HeroJersey colorA="#F5D90A" colorB="#1A8F5C" number="11" side="right" />;
-}
-
-function HeroJersey({
-  colorA,
-  colorB,
-  number,
-  centerStripe,
-  side,
+function HamburgerMenu({
+  dark,
+  displayName,
+  displayRole,
+  initials,
+  authenticated,
+  profileReady,
+  onClose,
+  onFeatureClick,
+  onLogin,
+  onCompleteProfile,
+  onLogout,
 }: {
-  colorA: string;
-  colorB: string;
-  number: string;
-  centerStripe?: boolean;
-  side?: 'left' | 'right';
+  dark: boolean;
+  displayName: string;
+  displayRole: string;
+  initials: string;
+  authenticated: boolean;
+  profileReady: boolean;
+  onClose: () => void;
+  onFeatureClick: (event: ReactMouseEvent<HTMLAnchorElement>, href: string) => void;
+  onLogin: () => void;
+  onCompleteProfile: () => void;
+  onLogout: () => void;
 }) {
+  const panel = dark ? 'border-white/12 bg-[#05111f]/96 text-white' : 'border-slate-200 bg-white/96 text-slate-950';
+  const muted = dark ? 'text-white/55' : 'text-slate-500';
+
   return (
-    <svg viewBox="0 0 230 320" className="h-[230px] w-[150px] drop-shadow-[0_25px_35px_rgba(0,0,0,0.45)] sm:h-[300px] sm:w-[190px]" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M74 22L54 44L28 52V294H202V52L176 44L156 22H74Z" fill={colorA} stroke="#081120" strokeWidth="5" />
-      <path d="M74 22L90 47H140L156 22" fill="#0A1428" stroke="#081120" strokeWidth="5" />
-      <path d="M90 47H140" stroke="#A5C7FF" strokeWidth="3.5" strokeLinecap="round" opacity="0.7" />
-      <path d="M54 44L86 65M176 44L144 65" stroke="#E4EFFD" strokeOpacity="0.8" strokeWidth="6" strokeLinecap="round" />
-      {centerStripe ? (
-        <>
-          <rect x="75" y="48" width="26" height="246" fill={colorB} opacity="0.95" />
-          <rect x="129" y="48" width="26" height="246" fill={colorB} opacity="0.95" />
-        </>
-      ) : side === 'left' ? (
-        <>
-          <rect x="44" y="58" width="26" height="226" fill={colorB} opacity="0.95" />
-          <rect x="95" y="58" width="18" height="226" fill="#ffffff" opacity="0.85" />
-        </>
-      ) : (
-        <>
-          <rect x="160" y="58" width="26" height="226" fill={colorB} opacity="0.95" />
-          <rect x="118" y="58" width="18" height="226" fill="#ffffff" opacity="0.85" />
-        </>
-      )}
-      <path d="M65 80H84" stroke="#D9E8FF" strokeWidth="5" strokeLinecap="round" opacity="0.75" />
-      <circle cx="157" cy="84" r="14" fill="#F6D54A" opacity="0.92" />
-      <path d="M157 72L160 80H168L161.5 85L164 93L157 88L150 93L152.5 85L146 80H154L157 72Z" fill="#0E316A" />
-      <text x="115" y="170" textAnchor="middle" fontSize="58" fontWeight="800" fill="#0A1428">
-        {number}
-      </text>
-      <path d="M75 22H155" stroke="#D9E8FF" strokeWidth="4" strokeLinecap="round" opacity="0.75" />
-    </svg>
+    <div className="fixed inset-0 z-[80] overflow-y-auto bg-[#020812]/86 p-3 backdrop-blur-xl sm:p-5 lg:p-7">
+      <div
+        className="pointer-events-none fixed inset-0 bg-cover bg-center opacity-25"
+        style={{ backgroundImage: "url('/dashboard/hero-stadium.png')" }}
+      />
+      <div className="relative mx-auto max-w-[1450px]">
+        <div className="mb-4 flex items-center justify-between">
+          <Brand dark />
+          <button onClick={onClose} className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-black/30 text-white">
+            <X className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr_0.8fr]">
+          <section className={`rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-2xl font-black">Menu</h2>
+              <Menu className="h-5 w-5 text-sky-400" />
+            </div>
+            <div className="space-y-1.5">
+              <a href="/" className="flex items-center gap-3 rounded-2xl bg-[#0875ff] px-4 py-3 font-semibold text-white">
+                <Home className="h-5 w-5" /> Home
+              </a>
+              {[
+                ['Tools', '/tools', Layers3],
+                ['Templates', '/templates', FileImage],
+                ['Projects', '/projects', FolderOpen],
+                ['Design Elements', '/design-elements', Layers3],
+                ['AI Assistant', '/ai-assistant', Bot],
+                ['My Library', '/projects', ImageIcon],
+                ['File Manager', '/projects', FolderOpen],
+                ['Cloud Storage', '/backup', Cloud],
+                ['Pricing', '/upgrade', Crown],
+                ['Help & Support', '/help-support', CircleHelp],
+                ['Settings', '/settings', Settings],
+              ].map(([label, href, Icon]) => {
+                const TypedIcon = Icon as ComponentType<{ className?: string }>;
+                return (
+                  <a
+                    key={String(label)}
+                    href={String(href)}
+                    onClick={(event) => onFeatureClick(event, String(href))}
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition hover:bg-sky-500/10 ${muted}`}
+                  >
+                    <TypedIcon className="h-5 w-5" />
+                    <span className="flex-1">{String(label)}</span>
+                    <span>›</span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className={`rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
+            <div className="mb-5 flex items-center justify-between">
+              <h2 className="text-2xl font-black">Tools</h2>
+              <span className="text-sm text-sky-400">Studio</span>
+            </div>
+            <div className="space-y-2">
+              {tools.map((tool) => {
+                const Icon = tool.icon;
+                return (
+                  <a
+                    key={tool.href}
+                    href={tool.href}
+                    onClick={(event) => onFeatureClick(event, tool.href)}
+                    className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
+                      dark ? 'border-white/8 bg-white/[0.035] hover:border-sky-400/25' : 'border-slate-200 bg-slate-50 hover:border-sky-300'
+                    }`}
+                  >
+                    <img src={tool.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-semibold">{tool.title}</div>
+                      <div className={`mt-1 text-xs ${muted}`}>Open studio feature</div>
+                    </div>
+                    <Icon className="h-5 w-5 text-sky-400" />
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className={`h-fit rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
+            <div className="flex items-center gap-4 rounded-2xl border border-sky-400/15 bg-sky-500/[0.06] p-4">
+              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#164d90,#0b8dff)] text-xl font-bold text-white">{initials}</span>
+              <div className="min-w-0">
+                <div className="truncate text-xl font-bold">{displayName}</div>
+                <div className={`mt-1 truncate text-sm ${muted}`}>{displayRole}</div>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-2">
+              {authenticated ? (
+                <>
+                  {!profileReady ? (
+                    <button onClick={onCompleteProfile} className="flex w-full items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-500/10 px-4 py-3 text-left font-semibold text-sky-300">
+                      <UserRound className="h-5 w-5" /> Complete Profile
+                    </button>
+                  ) : (
+                    <a href="/settings" onClick={(event) => onFeatureClick(event, '/settings')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
+                      <UserRound className="h-5 w-5" /> My Profile
+                    </a>
+                  )}
+                  <a href="/projects" onClick={(event) => onFeatureClick(event, '/projects')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
+                    <FolderOpen className="h-5 w-5" /> My Projects
+                  </a>
+                  <a href="/backup" onClick={(event) => onFeatureClick(event, '/backup')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
+                    <Cloud className="h-5 w-5" /> Cloud / Backup
+                  </a>
+                  <a href="/settings" onClick={(event) => onFeatureClick(event, '/settings')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
+                    <Settings className="h-5 w-5" /> Settings
+                  </a>
+                  <button onClick={onLogout} className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-left font-semibold text-red-300">
+                    <LogOut className="h-5 w-5" /> Logout
+                  </button>
+                </>
+              ) : (
+                <button onClick={onLogin} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0875ff] px-4 py-3 font-bold text-white">
+                  <LogIn className="h-5 w-5" /> Login
+                </button>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
   );
 }
-

@@ -11,6 +11,9 @@ const tools = [
   { title: 'BatchForge', href: '/batchforge', description: 'Batch production workspace for names, numbers, quantities, sizes, and repeated jersey outputs.', icon: Layers3, active: false },
   { title: 'ExportPack', href: '/exportpack', description: 'Prepare production-ready export bundles across editable and delivery formats.', icon: PackageOpen, active: false },
   { title: 'OrderSheet', href: '/ordersheet', description: 'Build structured production order sheets from customer and batch requirements.', icon: FileCog, active: false },
+  { title: 'Manual Vector Tracing', href: '/manual-vector-tracing', description: 'Manual pen/path tracing workspace for precision vector cleanup and production-ready artwork.', icon: SquarePen, active: false },
+  { title: 'Colour Editor', href: '/colour-editor', description: 'Manual colour editing workspace for fills, strokes, palettes, replacement, and print colour control.', icon: Layers3, active: false },
+  { title: 'Manual Production / Cut Setup', href: '/manual-production-cut-setup', description: 'Manually arrange production panels, cut lines, spacing, labels, and sublimation layout setup.', icon: FileImage, active: false },
 ];
 
 export default function ToolsPage() {

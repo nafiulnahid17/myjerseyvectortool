@@ -268,47 +268,251 @@ function bounds(svg: SVGElement) {
 function makeEps(svg: string) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(svg, "image/svg+xml");
-  const root = doc.documentElement as unknown as SVGElement;
+  const root = doc.documentElement as unknown as SVGSVGElement;
   const size = bounds(root);
 
-  const lines: string[] = [
-    "%!PS-Adobe-3.0 EPSF-3.0",
-    "%%BoundingBox: 0 0 " + Math.ceil(size.width) + " " + Math.ceil(size.height),
-    "%%Creator: My Jersey Studio",
-    "%%Title: Editable Vector Artwork",
-    "%%LanguageLevel: 2",
-    "%%Pages: 1",
-    "%%EndComments",
-    "1 setlinejoin",
-    "1 setlinecap",
-  ];
+  const host = document.createElement("div");
+  host.style.position = "fixed";
+  host.style.left = "-100000px";
+  host.style.top = "0";
+  host.style.width = String(size.width) + "px";
+  host.style.height = String(size.height) + "px";
+  host.style.pointerEvents = "none";
+  host.innerHTML = new XMLSerializer().serializeToString(root);
+  document.body.appendChild(host);
 
-  Array.from(root.querySelectorAll("path")).forEach((path, index) => {
-    const d = path.getAttribute("d");
-    if (!d) return;
+  try {
+    const liveRoot = host.querySelector("svg") as SVGSVGElement | null;
+    if (!liveRoot) throw new Error("Could not prepare EPS vector artwork.");
 
-    const commands = pathToPs(d, size.height);
-    if (!commands) return;
+    const lines: string[] = [
+      "%!PS-Adobe-3.0 EPSF-3.0",
+      "%%BoundingBox: 0 0 " + Math.ceil(size.width) + " " + Math.ceil(size.height),
+      "%%Creator: My Jersey Studio",
+      "%%Title: Editable Vector Artwork",
+      "%%LanguageLevel: 2",
+      "%%Pages: 1",
+      "%%EndComments",
+      "1 setlinejoin",
+      "1 setlinecap",
+    ];
 
-    const fill = parseColor(readStyle(path, "fill"));
+    const elements = Array.from(
+      liveRoot.querySelectorAll<SVGGraphicsElement>(
+        "path,polygon,polyline,rect,circle,ellipse,line,text",
+      ),
+    ).filter((element) => !element.closest("defs") && element.getAttribute("display") !== "none");
 
-    lines.push("% editable-object-" + String(index + 1).padStart(5, "0"));
-    lines.push("gsave");
-    lines.push("newpath");
-    lines.push(commands);
+    elements.forEach((element, index) => {
+      const commands = svgElementToPostScript(element, size.height);
+      if (!commands) return;
 
-    if (fill) {
-      lines.push(fill[0].toFixed(5) + " " + fill[1].toFixed(5) + " " + fill[2].toFixed(5) + " setrgbcolor");
-      lines.push("fill");
-    }
+      const fill = parseColor(readStyle(element, "fill"));
+      const stroke = parseColor(readStyle(element, "stroke"));
+      const strokeWidth = Number.parseFloat(readStyle(element, "stroke-width") || "1");
+      const opacity = Number.parseFloat(element.getAttribute("opacity") || "1");
+      const matrix = element.getCTM();
 
-    lines.push("grestore");
-  });
+      lines.push("% editable-object-" + String(index + 1).padStart(5, "0"));
+      lines.push("gsave");
 
-  lines.push("showpage");
-  lines.push("%%EOF");
+      if (matrix) {
+        const ps = svgMatrixToPostScript(matrix, size.height);
+        lines.push(
+          "[" +
+            ps.a.toFixed(8) + " " +
+            ps.b.toFixed(8) + " " +
+            ps.c.toFixed(8) + " " +
+            ps.d.toFixed(8) + " " +
+            ps.e.toFixed(8) + " " +
+            ps.f.toFixed(8) +
+            "] concat",
+        );
+      }
 
-  return new Blob([lines.join("\n")], { type: "application/postscript" });
+      if (element.tagName.toLowerCase() === "text") {
+        const textFill = fill || [0, 0, 0] as const;
+        const fontSize = Math.max(1, Number.parseFloat(element.getAttribute("font-size") || "16"));
+        const family = sanitizePostScriptFont(element.getAttribute("font-family") || "Helvetica");
+        const text = escapePostScriptText(element.textContent || "");
+        const x = Number.parseFloat(element.getAttribute("x") || "0");
+        const y = Number.parseFloat(element.getAttribute("y") || "0");
+
+        lines.push(textFill[0].toFixed(5) + " " + textFill[1].toFixed(5) + " " + textFill[2].toFixed(5) + " setrgbcolor");
+        lines.push("/" + family + " findfont " + fontSize.toFixed(3) + " scalefont setfont");
+        lines.push(round(x) + " " + round(size.height - y) + " moveto");
+        lines.push("(" + text + ") show");
+        lines.push("grestore");
+        return;
+      }
+
+      lines.push("newpath");
+      lines.push(commands);
+
+      if (fill) {
+        lines.push(fill[0].toFixed(5) + " " + fill[1].toFixed(5) + " " + fill[2].toFixed(5) + " setrgbcolor");
+
+        if (stroke) {
+          lines.push("gsave fill grestore");
+        } else {
+          lines.push("fill");
+        }
+      }
+
+      if (stroke) {
+        lines.push(stroke[0].toFixed(5) + " " + stroke[1].toFixed(5) + " " + stroke[2].toFixed(5) + " setrgbcolor");
+        lines.push(String(Number.isFinite(strokeWidth) ? strokeWidth : 1) + " setlinewidth");
+        lines.push("stroke");
+      }
+
+      if (!fill && !stroke) {
+        lines.push("0 0 0 setrgbcolor");
+        lines.push("fill");
+      }
+
+      if (Number.isFinite(opacity) && opacity < 1) {
+        lines.push("% Source opacity: " + opacity.toFixed(3));
+      }
+
+      lines.push("grestore");
+    });
+
+    lines.push("showpage");
+    lines.push("%%EOF");
+
+    return new Blob([lines.join("\n")], {
+      type: "application/postscript",
+    });
+  } finally {
+    host.remove();
+  }
+}
+
+function svgMatrixToPostScript(matrix: DOMMatrix, height: number) {
+  return {
+    a: matrix.a,
+    b: -matrix.b,
+    c: -matrix.c,
+    d: matrix.d,
+    e: matrix.c * height + matrix.e,
+    f: height * (1 - matrix.d) - matrix.f,
+  };
+}
+
+function svgElementToPostScript(element: SVGGraphicsElement, height: number) {
+  const tag = element.tagName.toLowerCase();
+
+  if (tag === "path") {
+    const d = element.getAttribute("d");
+    return d ? pathToPs(d, height) : "";
+  }
+
+  if (tag === "rect") {
+    const x = Number.parseFloat(element.getAttribute("x") || "0");
+    const y = Number.parseFloat(element.getAttribute("y") || "0");
+    const width = Number.parseFloat(element.getAttribute("width") || "0");
+    const rectHeight = Number.parseFloat(element.getAttribute("height") || "0");
+
+    return [
+      round(x) + " " + round(height - y) + " moveto",
+      round(x + width) + " " + round(height - y) + " lineto",
+      round(x + width) + " " + round(height - (y + rectHeight)) + " lineto",
+      round(x) + " " + round(height - (y + rectHeight)) + " lineto",
+      "closepath",
+    ].join("\n");
+  }
+
+  if (tag === "line") {
+    const x1 = Number.parseFloat(element.getAttribute("x1") || "0");
+    const y1 = Number.parseFloat(element.getAttribute("y1") || "0");
+    const x2 = Number.parseFloat(element.getAttribute("x2") || "0");
+    const y2 = Number.parseFloat(element.getAttribute("y2") || "0");
+
+    return [
+      round(x1) + " " + round(height - y1) + " moveto",
+      round(x2) + " " + round(height - y2) + " lineto",
+    ].join("\n");
+  }
+
+  if (tag === "polygon" || tag === "polyline") {
+    const points = (element.getAttribute("points") || "")
+      .trim()
+      .split(/\s+/)
+      .map((point) => point.split(",").map(Number))
+      .filter((point) => point.length === 2 && point.every(Number.isFinite));
+
+    if (!points.length) return "";
+
+    const commands = [
+      round(points[0][0]) + " " + round(height - points[0][1]) + " moveto",
+      ...points.slice(1).map(
+        (point) => round(point[0]) + " " + round(height - point[1]) + " lineto",
+      ),
+    ];
+
+    if (tag === "polygon") commands.push("closepath");
+    return commands.join("\n");
+  }
+
+  if (tag === "circle") {
+    const cx = Number.parseFloat(element.getAttribute("cx") || "0");
+    const cy = Number.parseFloat(element.getAttribute("cy") || "0");
+    const radius = Number.parseFloat(element.getAttribute("r") || "0");
+    return ellipsePostScript(cx, cy, radius, radius, height);
+  }
+
+  if (tag === "ellipse") {
+    const cx = Number.parseFloat(element.getAttribute("cx") || "0");
+    const cy = Number.parseFloat(element.getAttribute("cy") || "0");
+    const rx = Number.parseFloat(element.getAttribute("rx") || "0");
+    const ry = Number.parseFloat(element.getAttribute("ry") || "0");
+    return ellipsePostScript(cx, cy, rx, ry, height);
+  }
+
+  return "";
+}
+
+function ellipsePostScript(
+  cx: number,
+  cy: number,
+  rx: number,
+  ry: number,
+  height: number,
+) {
+  const k = 0.5522847498307936;
+  const py = height - cy;
+
+  return [
+    round(cx + rx) + " " + round(py) + " moveto",
+    round(cx + rx) + " " + round(py + k * ry) + " " +
+      round(cx + k * rx) + " " + round(py + ry) + " " +
+      round(cx) + " " + round(py + ry) + " curveto",
+    round(cx - k * rx) + " " + round(py + ry) + " " +
+      round(cx - rx) + " " + round(py + k * ry) + " " +
+      round(cx - rx) + " " + round(py) + " curveto",
+    round(cx - rx) + " " + round(py - k * ry) + " " +
+      round(cx - k * rx) + " " + round(py - ry) + " " +
+      round(cx) + " " + round(py - ry) + " curveto",
+    round(cx + k * rx) + " " + round(py - ry) + " " +
+      round(cx + rx) + " " + round(py - k * ry) + " " +
+      round(cx + rx) + " " + round(py) + " curveto",
+    "closepath",
+  ].join("\n");
+}
+
+function sanitizePostScriptFont(fontFamily: string) {
+  const first = fontFamily.split(",")[0].replace(/["']/g, "").trim().toLowerCase();
+
+  if (first.includes("times")) return "Times-Roman";
+  if (first.includes("courier") || first.includes("mono")) return "Courier";
+  return "Helvetica";
+}
+
+function escapePostScriptText(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)");
 }
 
 function readStyle(element: Element, property: string) {

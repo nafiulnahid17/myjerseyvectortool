@@ -81,6 +81,7 @@ declare global {
 export function VectorCustomizeEditor(props: EditorProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const autoOcrStartedRef = useRef(false);
   const dragRef = useRef<{
     id: string;
     startX: number;
@@ -140,6 +141,17 @@ export function VectorCustomizeEditor(props: EditorProps) {
       cancelled = true;
     };
   }, [props.sourceUrl, props.initialSvg]);
+
+  useEffect(() => {
+    if (initializing || !svgMarkup || autoOcrStartedRef.current) return;
+
+    autoOcrStartedRef.current = true;
+    const timer = window.setTimeout(() => {
+      void runOcr();
+    }, 900);
+
+    return () => window.clearTimeout(timer);
+  }, [initializing, svgMarkup]);
 
   useEffect(() => {
     const move = (event: PointerEvent) => {

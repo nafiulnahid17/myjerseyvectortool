@@ -204,6 +204,11 @@ export function DashboardShell() {
                 >
                   <Menu className="h-6 w-6" />
                 </button>
+                <img
+                  src="/brand/jerseyos-logo.svg"
+                  alt="JerseyOS"
+                  className="hidden h-11 w-11 shrink-0 object-contain sm:block"
+                />
                 <div className="relative w-full max-w-[580px]">
                   <Search className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${muted}`} />
                   <input
@@ -312,15 +317,24 @@ export function DashboardShell() {
             >
               <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(1,8,19,.96)_0%,rgba(2,11,25,.86)_34%,rgba(2,11,25,.30)_64%,rgba(2,11,25,.12)_100%)]" />
               <div className="relative z-10 max-w-[690px] p-7 sm:p-9 lg:p-11">
-                <p className="text-xl italic text-white/90">Welcome To</p>
-                <h1 className="mt-1 text-5xl font-black uppercase leading-[0.9] tracking-[0.03em] text-white sm:text-6xl lg:text-7xl">
-                  My Jersey
-                  <span className="mt-2 block bg-[linear-gradient(90deg,#e8f3ff,#2f91ff,#53c4ff)] bg-clip-text text-transparent">Studio</span>
-                </h1>
-                <div className="mt-5 h-1.5 w-36 rounded-full bg-[linear-gradient(90deg,#1ec8ff,#1977ff)]" />
-                <p className="mt-5 max-w-[610px] text-base leading-7 text-white/82 sm:text-lg">
-                  Turn any jersey into a production-ready design â€” upload, vectorize, customize, preview, and download.
+                <div className="flex flex-wrap items-center gap-5">
+                  <img
+                    src="/brand/jerseyos-logo.svg"
+                    alt="JerseyOS"
+                    className="h-28 w-28 shrink-0 object-contain sm:h-32 sm:w-32"
+                  />
+                  <div>
+                    <p className="text-xl italic text-white/90">Welcome To</p>
+                    <h1 className="mt-1 text-5xl font-black leading-[0.9] tracking-[0.02em] text-white sm:text-6xl lg:text-7xl">
+                      JerseyOS
+                    </h1>
+                  </div>
+                </div>
+                <div className="mt-5 h-1.5 w-36 rounded-full bg-[linear-gradient(90deg,#d6a42b,#f7df87)]" />
+                <p className="mt-5 max-w-[650px] text-base font-semibold leading-7 text-white/88 sm:text-lg">
+                  AI-Powered Full Operating System for Jersey Production
                 </p>
+                <p className="mt-2 text-sm font-medium text-amber-200/80">Owned by My Jersey</p>
                 <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.17em] text-white/65 sm:text-sm">
                   <span>Upload</span><span className="text-sky-400">â€¢</span>
                   <span>Vectorize</span><span className="text-sky-400">â€¢</span>
@@ -407,6 +421,10 @@ export function DashboardShell() {
                 </a>
               </div>
             </section>
+
+            <footer className={`mt-7 border-t pt-5 text-center text-xs ${dark ? 'border-white/8 text-white/35' : 'border-slate-200 text-slate-400'}`}>
+              Copyright 2027- 2028 @ My Jersey
+            </footer>
           </div>
         </section>
       </div>
@@ -439,12 +457,16 @@ export function DashboardShell() {
 function Brand({ dark }: { dark: boolean }) {
   return (
     <div className="flex items-center gap-3 px-2 py-2">
-      <div className={`grid h-14 w-14 place-items-center rounded-2xl border text-2xl font-black ${dark ? 'border-white/10 bg-white/[0.04]' : 'border-slate-200 bg-white'}`}>
-        <span>M<span className="text-[#0875ff]">J</span></span>
-      </div>
-      <div>
-        <div className="text-lg font-black leading-none tracking-wide">MY JERSEY</div>
-        <div className="mt-1 text-xs font-bold tracking-[0.34em] text-[#0875ff]">STUDIO</div>
+      <img
+        src="/brand/jerseyos-logo.svg"
+        alt="JerseyOS"
+        className="h-16 w-16 shrink-0 object-contain"
+      />
+      <div className="min-w-0">
+        <div className="text-xl font-black leading-none tracking-wide">JerseyOS</div>
+        <div className={`mt-1 max-w-[165px] text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] ${dark ? 'text-amber-200/70' : 'text-amber-700'}`}>
+          AI-Powered Jersey Production OS
+        </div>
       </div>
     </div>
   );

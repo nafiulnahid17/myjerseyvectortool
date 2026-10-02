@@ -1,2 +1,0 @@
-export function traceOptions(colors:number,detail:boolean){return {numberofcolors:colors,colorsampling:2,colorquantcycles:3,pathomit:detail?10:15,ltres:detail?.7:1.2,qtres:detail?.7:1.2,roundcoords:2,viewbox:true,strokewidth:.3,linefilter:false,blurradius:detail?1:0,blurdelta:24,desc:false};}
-export function stripTrace(svg:string){return svg.slice(svg.indexOf('>')+1,svg.lastIndexOf('</svg>')).replace(/<desc[\s\S]*?<\/desc>/g,'').replace(/<path\b[^>]*\bopacity="0"[^>]*\/>/g,'');}

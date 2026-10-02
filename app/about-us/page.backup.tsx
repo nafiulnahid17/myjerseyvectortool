@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
   ArrowRight,
   Bot,
@@ -6,6 +6,7 @@ import {
   Code2,
   Download,
   ExternalLink,
+  Facebook,
   FileCog,
   Image as ImageIcon,
   Layers3,
@@ -84,7 +85,7 @@ export default function AboutUsPage() {
 
             <div className="relative grid items-center gap-8 lg:grid-cols-[0.85fr_1.15fr]">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.26em] text-cyan-300">âœ¦ About Us</p>
+                <p className="text-xs font-black uppercase tracking-[0.26em] text-cyan-300">✦ About Us</p>
                 <h1 className="mt-3 text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
                   About
                   <span className="block">My Jersey <span className="text-cyan-400">Studio</span></span>
@@ -110,7 +111,7 @@ export default function AboutUsPage() {
           <section className="mt-4 overflow-hidden rounded-[28px] border border-cyan-400/35 bg-[linear-gradient(100deg,rgba(2,14,28,0.98),rgba(3,23,45,0.98))] shadow-[0_0_35px_rgba(0,187,255,0.18)]">
             <div className="grid lg:grid-cols-[0.82fr_1.08fr_0.9fr]">
               <div className="relative min-h-[340px] overflow-hidden border-b border-white/8 lg:border-b-0 lg:border-r">
-                <img src="/about/developer-the-artist.png" alt="The Artist â€” Lead Developer" className="absolute inset-0 h-full w-full object-cover object-[center_30%]" />
+                <img src="/about/developer-the-artist.png" alt="The Artist — Lead Developer" className="absolute inset-0 h-full w-full object-cover object-[center_30%]" />
                 <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,9,20,0.1),rgba(0,9,20,0.35)),linear-gradient(180deg,transparent_55%,rgba(0,7,15,0.88))]" />
                 <div className="absolute bottom-6 left-6"><div className="text-4xl font-serif italic text-white">The Artist</div></div>
               </div>
@@ -119,7 +120,7 @@ export default function AboutUsPage() {
                 <p className="text-sm font-black uppercase tracking-[0.18em] text-cyan-400">Lead Developer</p>
                 <div className="mt-2 flex items-center gap-2">
                   <h2 className="text-4xl font-black">The Artist</h2>
-                  <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-xs font-black text-[#02101c]">âœ“</span>
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-xs font-black text-[#02101c]">✓</span>
                 </div>
                 <p className="mt-4 text-sm leading-7 text-white/68">
                   Creator and lead developer of My Jersey Studio, focused on product design, full-stack implementation,
@@ -156,7 +157,7 @@ export default function AboutUsPage() {
                       <MessageCircle className="h-4 w-4 text-emerald-400" /> WhatsApp
                     </a>
                     <a href="https://www.facebook.com/share/1H4UxPjq4q/" target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-blue-400/25 bg-white/[0.03] px-3 py-3 text-sm font-semibold">
-                      <ExternalLink className="h-4 w-4 text-blue-400" /> Facebook
+                      <Facebook className="h-4 w-4 text-blue-400" /> Facebook
                     </a>
                   </div>
 
@@ -186,7 +187,7 @@ export default function AboutUsPage() {
           </section>
 
           <section className="mt-5">
-            <SectionTitle title="How It Works â€” Technical Pipeline" subtitle="A structured workflow that combines AI, pattern systems and production review." />
+            <SectionTitle title="How It Works — Technical Pipeline" subtitle="A structured workflow that combines AI, pattern systems and production review." />
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
               {pipeline.map((item) => {
                 const Icon = item.icon;
@@ -234,7 +235,7 @@ export default function AboutUsPage() {
           </section>
 
           <footer className="mt-5 flex flex-col gap-3 border-t border-white/8 py-5 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
-            <span>My Jersey Studio â€¢ Production Workspace</span>
+            <span>My Jersey Studio • Production Workspace</span>
             <a href="https://www.facebook.com/share/1H4UxPjq4q/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sky-400">
               Developer Facebook <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -292,10 +293,9 @@ function HeroStudioArtwork() {
           <div className="grid grid-cols-4 gap-2">
             {['#0ea5ff','#2563eb','#64748b','#020617'].map((color) => <div key={color} className="h-12 rounded-xl border border-white/10" style={{ backgroundColor: color }} />)}
           </div>
-          <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/8 px-3 py-2 text-center text-xs font-bold text-cyan-200">Image â†’ Vector â€¢ Production Ready</div>
+          <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/8 px-3 py-2 text-center text-xs font-bold text-cyan-200">Image → Vector • Production Ready</div>
         </div>
       </div>
     </div>
   );
 }
-

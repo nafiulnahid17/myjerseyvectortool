@@ -4,7 +4,6 @@ import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
-  ChevronDown,
   CircleHelp,
   Cloud,
   Coins,
@@ -100,7 +99,7 @@ export function DashboardShell() {
   const session = useStudioSession();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [languageOpen, setLanguageOpen] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'bn'>('en');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   useEffect(() => {
@@ -123,8 +122,6 @@ export function DashboardShell() {
   }, [theme]);
 
   const dark = theme === 'dark';
-  const filteredTools = tools;
-
   const groupedTools = useMemo(
     () =>
       categoryOrder
@@ -157,8 +154,8 @@ export function DashboardShell() {
 
         <section className="min-w-0 flex-1">
           <div className="min-h-screen px-3 pb-6 pt-4 sm:px-5 lg:px-6">
-            <header className="mb-4 flex min-h-14 items-center justify-end gap-2 pl-14 sm:pl-16 lg:pl-0">
-              <div className="flex flex-wrap items-center justify-end gap-2">
+            <header className="mb-4 flex min-h-14 items-center justify-start gap-2 pl-14 sm:pl-16">
+              <div className="flex flex-wrap items-center justify-start gap-2">
                 <div className={`inline-flex rounded-2xl border p-1 ${dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-slate-50'}`}>
                   <button
                     onClick={() => setTheme('light')}
@@ -176,21 +173,34 @@ export function DashboardShell() {
                   </button>
                 </div>
 
-                <div className="relative">
+                <div className={`inline-flex h-12 items-center rounded-2xl border p-1 ${
+                  dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'
+                }`}>
+                  <Globe className={`ml-2 mr-1 h-4 w-4 ${muted}`} />
                   <button
-                    onClick={() => setLanguageOpen((open) => !open)}
-                    className={`inline-flex h-12 items-center gap-2 rounded-2xl border px-4 text-sm font-semibold ${
-                      dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'
+                    type="button"
+                    onClick={() => setLanguage('en')}
+                    className={`h-9 rounded-xl px-3 text-xs font-bold transition ${
+                      language === 'en'
+                        ? 'bg-[#0875ff] text-white shadow-lg'
+                        : muted
                     }`}
+                    aria-label="English"
                   >
-                    <Globe className="h-4 w-4" /> English <ChevronDown className="h-4 w-4" />
+                    English
                   </button>
-                  {languageOpen ? (
-                    <div className={`absolute right-0 top-14 z-30 w-44 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
-                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">English</button>
-                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">বাংলা</button>
-                    </div>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setLanguage('bn')}
+                    className={`h-9 rounded-xl px-3 text-xs font-bold transition ${
+                      language === 'bn'
+                        ? 'bg-[#0875ff] text-white shadow-lg'
+                        : muted
+                    }`}
+                    aria-label="বাংলা"
+                  >
+                    বাংলা
+                  </button>
                 </div>
 
                 <div className="relative">
@@ -261,44 +271,36 @@ export function DashboardShell() {
                 <a href="/tools" onClick={(event) => featureClick(event, '/tools')} className="text-sm font-semibold text-sky-500">View All â†’</a>
               </div>
 
-              {filteredTools.length ? (
-                <div className="space-y-7">
-                  {groupedTools.map((group) => (
-                    <div key={group.category}>
-                      <div className="mb-3 flex items-center gap-3">
-                        <h3 className="text-lg font-black">{group.category}</h3>
-                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${dark ? 'bg-white/[0.05] text-white/45' : 'bg-slate-100 text-slate-500'}`}>
-                          {group.tools.length}
-                        </span>
-                      </div>
-                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-                        {group.tools.map((tool) => (
-                          <a
-                            key={tool.href}
-                            href={tool.href}
-                            onClick={(event) => featureClick(event, tool.href)}
-                            className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
-                              dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
-                            }`}
-                          >
-                            <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
-                            <div className="border-t border-white/8 px-4 py-3">
-                              <div className="font-bold">{tool.title}</div>
-                              <div className={`mt-1 text-xs ${muted}`}>{tool.category}</div>
-                            </div>
-                          </a>
-                        ))}
-                      </div>
+              <div className="space-y-7">
+                {groupedTools.map((group) => (
+                  <div key={group.category}>
+                    <div className="mb-3 flex items-center gap-3">
+                      <h3 className="text-lg font-black">{group.category}</h3>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${dark ? 'bg-white/[0.05] text-white/45' : 'bg-slate-100 text-slate-500'}`}>
+                        {group.tools.length}
+                      </span>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className={`rounded-[24px] border border-dashed p-9 text-center ${dark ? 'border-white/10 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'}`}>
-                  <Search className="mx-auto h-8 w-8 text-sky-500" />
-                  <div className="mt-3 font-semibold">No matching tools</div>
-                  <button onClick={() => setQuery('')} className="mt-2 text-sm text-sky-500">Clear search</button>
-                </div>
-              )}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+                      {group.tools.map((tool) => (
+                        <a
+                          key={tool.href}
+                          href={tool.href}
+                          onClick={(event) => featureClick(event, tool.href)}
+                          className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
+                            dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
+                          }`}
+                        >
+                          <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
+                          <div className="border-t border-white/8 px-4 py-3">
+                            <div className="font-bold">{tool.title}</div>
+                            <div className={`mt-1 text-xs ${muted}`}>{tool.category}</div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </section>
 
             <section className="mt-7">

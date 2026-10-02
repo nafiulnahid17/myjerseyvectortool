@@ -49,8 +49,8 @@ const categoryOrder: ToolCategory[] = [
 ];
 
 const tools: Tool[] = [
-  { title: 'VectorForge', href: '/image-to-vector', image: '/dashboard/tools/image-to-vector.png', keywords: 'vectorforge image to vector vector image jersey production', icon: ImageIcon, category: 'AI Powered Tools' },
   { title: 'AutoPilot', href: '/oneclick-creation', image: '/dashboard/tools/oneclick-creation.png', keywords: 'autopilot oneclick creation automatic one click layout', icon: Sparkles, category: 'AI Powered Tools' },
+  { title: 'VectorForge', href: '/image-to-vector', image: '/dashboard/tools/image-to-vector.png', keywords: 'vectorforge image to vector vector image jersey production', icon: ImageIcon, category: 'AI Powered Tools' },
   { title: 'VectorLab', href: '/edit-existing-file', image: '/dashboard/tools/edit-existing-file.png', keywords: 'vectorlab edit existing file edit modify customize', icon: SquarePen, category: 'AI Powered Tools' },
   { title: 'Showcase AI', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: 'showcase ai mockup generator 2d 3d mockup preview', icon: PackageOpen, category: 'AI Powered Tools' },
   { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.svg', keywords: 'frontscan front ocr typography font analysis artwork', icon: Search, category: 'AI Powered Tools' },
@@ -281,22 +281,71 @@ export function DashboardShell() {
                       </span>
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-                      {group.tools.map((tool) => (
-                        <a
-                          key={tool.href}
-                          href={tool.href}
-                          onClick={(event) => featureClick(event, tool.href)}
-                          className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
-                            dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
-                          }`}
-                        >
-                          <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
-                          <div className="border-t border-white/8 px-4 py-3">
-                            <div className="font-bold">{tool.title}</div>
-                            <div className={`mt-1 text-xs ${muted}`}>{tool.category}</div>
-                          </div>
-                        </a>
-                      ))}
+                      {group.tools.map((tool) =>
+                        tool.title === 'AutoPilot' ? (
+                          <a
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={(event) => featureClick(event, tool.href)}
+                            className="autopilot-highlight-card group relative aspect-square overflow-hidden rounded-[28px] border border-amber-300/70 bg-white p-2.5 text-slate-950 shadow-[0_22px_60px_rgba(178,118,14,.22)] transition-all duration-300 hover:-translate-y-1.5 hover:border-amber-400 hover:shadow-[0_30px_78px_rgba(178,118,14,.30)]"
+                            aria-label="Open AutoPilot"
+                          >
+                            <div className="flex h-full min-h-0 flex-col">
+                              <div className="relative min-h-0 flex-[1.65] overflow-hidden rounded-[20px] border border-slate-200 bg-white">
+                                <img
+                                  src={tool.image}
+                                  alt="AutoPilot"
+                                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+                                />
+                                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/55" />
+                              </div>
+
+                              <div className="shrink-0 px-1 pt-2">
+                                <span className="flex h-10 w-full items-center justify-center rounded-xl border border-amber-300/70 bg-[linear-gradient(90deg,#fff9ea,#ffffff,#eef7ff)] text-sm font-black tracking-[0.01em] text-[#0b3272] shadow-[0_8px_18px_rgba(15,67,140,.10)] transition group-hover:border-amber-400 group-hover:shadow-[0_10px_22px_rgba(15,67,140,.15)]">
+                                  Use The Power
+                                </span>
+                              </div>
+
+                              <div className="mt-2 shrink-0 rounded-[16px] border border-[#d9e8fb] bg-[linear-gradient(135deg,#ffffff,#f3f8ff)] px-2.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,.9),0_8px_18px_rgba(12,56,110,.08)]">
+                                <div className="text-[10px] font-black uppercase tracking-[0.13em] text-[#153f7b]">
+                                  Highlight Workflow
+                                </div>
+                                <div className="mt-1.5 flex items-center gap-1 text-[10px] font-bold leading-tight text-[#173d73]">
+                                  <span className="inline-flex min-w-0 items-center gap-1">
+                                    <ImageIcon className="h-3.5 w-3.5 shrink-0 text-[#1677e8]" />
+                                    <span>Input</span>
+                                  </span>
+                                  <span className="shrink-0 text-amber-500">→</span>
+                                  <span className="inline-flex min-w-0 items-center gap-1">
+                                    <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#1677e8]" />
+                                    <span>Oneclick</span>
+                                  </span>
+                                  <span className="shrink-0 text-amber-500">→</span>
+                                  <span className="inline-flex min-w-0 items-center gap-1">
+                                    <FileCog className="h-3.5 w-3.5 shrink-0 text-[#1677e8]" />
+                                    <span>Get Editable SVG / AI File</span>
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </a>
+                        ) : (
+                          <a
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={(event) => featureClick(event, tool.href)}
+                            className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
+                              dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
+                            }`}
+                          >
+                            <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
+                            <div className="border-t border-white/8 px-4 py-3">
+                              <div className="font-bold">{tool.title}</div>
+                              <div className={`mt-1 text-xs ${muted}`}>{tool.category}</div>
+                            </div>
+                          </a>
+                        ),
+                      )}
                     </div>
                   </div>
                 ))}
@@ -345,6 +394,21 @@ export function DashboardShell() {
           </div>
         </div>
       ) : null}
+      <style>{`
+        @keyframes jerseyosAutoPilotFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+        .autopilot-highlight-card {
+          animation: jerseyosAutoPilotFloat 5.8s ease-in-out infinite;
+        }
+        .autopilot-highlight-card:hover {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .autopilot-highlight-card { animation: none; }
+        }
+      `}</style>
     </main>
   );
 }

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import {
   ArrowLeft,
@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
-import { prepareCloudflareReferenceImage } from '@/lib/ai/cloudflare-client-image';
+import { runImageWorkflow } from '@/lib/ai/imagegpt-browser';
 import type {
   AspectRatioId,
   ExportFormat,
@@ -220,6 +220,7 @@ export function ImageToVectorStudio() {
       setError('Upload a jersey image before continuing.');
       return;
     }
+
     if (!pattern) {
       setError('Choose a production pattern before continuing.');
       return;
@@ -227,49 +228,133 @@ export function ImageToVectorStudio() {
 
     setError('');
     setResultMode(mode);
-    setStatusMessage(mode === 'edit' ? 'Applying your customizationâ€¦' : 'Preparing the production layoutâ€¦');
     setPhase('generating');
 
-    const customizationPrompt = mode === 'edit' ? buildCustomizationPrompt(customize, customPrompt) : '';
-    const rawActiveFile = mode === 'edit' && generatedUrl ? await dataUrlToFile(generatedUrl, 'generated-layout.png') : sourceFile;
-    const activeFile = await prepareCloudflareReferenceImage(rawActiveFile);
-    const form = new FormData();
-    form.append('image', activeFile, activeFile.name);
-    form.append('pattern', pattern);
-    form.append('quality', quality);
-    form.append('aspectRatio', aspectRatio);
-    form.append('mode', mode);
-    if (customizationPrompt) form.append('customizationPrompt', customizationPrompt);
-    if (logoFile) {
-      const preparedLogo = await prepareCloudflareReferenceImage(logoFile);
-      form.append('reference', preparedLogo, preparedLogo.name);
-    }
+    const customizationPrompt =
+      mode === 'edit'
+        ? buildCustomizationPrompt(customize, customPrompt)
+        : '';
+
+    const activeFile =
+      mode === 'edit' && generatedUrl
+        ? await dataUrlToFile(
+            generatedUrl,
+            'generated-layout.png',
+          )
+        : sourceFile;
 
     try {
-      const response = await fetch('/api/vector-generation', { method: 'POST', body: form });
-      const data = (await response.json()) as GenerationResponse & { error?: string };
-      if (!response.ok) {
-        if (response.status === 503 && data.configured === false) {
-          setProviderConfigured(false);
-          setStatusMessage(data.message);
-          setPhase('result');
-          return;
-        }
-        throw new Error(data.error || data.message || 'Generation failed.');
+      if (mode === 'edit') {
+        setStatusMessage(
+          'Gemini 3 Pro Image is applying your customization…',
+        );
+
+        const result =
+          await runImageWorkflow({
+            image: activeFile,
+            workflow: 'customize',
+            pattern,
+            quality,
+            aspectRatio,
+            customizationPrompt,
+          });
+
+        setGeneratedUrl(
+          result.dataUrl,
+        );
+
+        setProviderConfigured(
+          true,
+        );
+
+        setProviderModel(
+          result.model,
+        );
+
+        setStatusMessage(
+          result.usedFallback
+            ? `Customization ready · Cloudflare fallback · ${result.model}`
+            : 'Customization ready · Gemini 3 Pro Image',
+        );
+
+        setPhase('result');
+        return;
       }
-      if (!data.imageDataUrl) throw new Error('The image service returned no output.');
-      setGeneratedUrl(data.imageDataUrl);
-      setProviderConfigured(true);
-      setProviderModel(data.model || providerModel);
-      setStatusMessage(data.message || 'Production layout ready.');
+
+      setStatusMessage(
+        'Step 1/2 · Gemini 3.1 Flash Image is analyzing the jersey…',
+      );
+
+      const analysis =
+        await runImageWorkflow({
+          image: activeFile,
+          workflow:
+            'image-to-vector-analysis',
+          pattern,
+          quality,
+          aspectRatio,
+        });
+
+      const normalizedFile =
+        new File(
+          [analysis.blob],
+          'jersey-analysis.png',
+          {
+            type:
+              analysis.blob.type ||
+              'image/png',
+          },
+        );
+
+      setStatusMessage(
+        'Step 2/2 · Gemini 3.1 Flash Image is creating the production layout…',
+      );
+
+      const finalResult =
+        await runImageWorkflow({
+          image: normalizedFile,
+          workflow:
+            'image-to-vector-final',
+          pattern,
+          quality,
+          aspectRatio,
+        });
+
+      setGeneratedUrl(
+        finalResult.dataUrl,
+      );
+
+      setProviderConfigured(
+        true,
+      );
+
+      setProviderModel(
+        finalResult.model,
+      );
+
+      setStatusMessage(
+        finalResult.usedFallback
+          ? `Production layout ready · Cloudflare fallback · ${finalResult.model}`
+          : 'Production layout ready · Gemini 3.1 Flash Image',
+      );
+
       setPhase('result');
     } catch (generationError) {
-      setError(generationError instanceof Error ? generationError.message : 'Generation failed.');
-      setPhase(mode === 'edit' ? 'customize' : 'setup');
+      setError(
+        generationError instanceof Error
+          ? generationError.message
+          : 'Generation failed.',
+      );
+
+      setPhase(
+        mode === 'edit'
+          ? 'customize'
+          : 'setup',
+      );
     }
   }
 
-  async function downloadCurrent() {
+async function downloadCurrent() {
     if (!visibleOutput) {
       setError('Generate or prepare an output before downloading.');
       return;
@@ -309,8 +394,8 @@ export function ImageToVectorStudio() {
                 {providerConfigured === null
                   ? 'Checking AI engineâ€¦'
                   : providerConfigured
-                    ? `Cloudflare Workers AI connected${providerModel ? ` Â· ${providerModel}` : ''}`
-                    : 'Cloudflare Workers AI binding required'}
+                    ? `ImageGPT.cloud + Cloudflare fallback${providerModel ? ` Â· ${providerModel}` : ''}`
+                    : 'ImageGPT.cloud configuration required'}
               </div>
               <button className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white/80">
                 <Globe className="h-4 w-4" /> English <ChevronDown className="h-4 w-4" />

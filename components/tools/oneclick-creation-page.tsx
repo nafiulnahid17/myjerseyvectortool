@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
-import { prepareCloudflareReferenceImage } from '@/lib/ai/cloudflare-client-image';
+import { runImageWorkflow, traceImageToSvg, validateProductionLayout } from '@/lib/ai/imagegpt-browser';
 import { ONECLICK_MASTER_COMMAND } from '@/lib/tools/master-command';
 
 type DownloadFormat = 'png' | 'jpg' | 'webp' | 'pdf' | 'svg';
@@ -85,42 +85,72 @@ export function OneClickCreationPage() {
 
     setIsGenerating(true);
     setError('');
-    setStatus('Running the default master command with Cloudflare Workers AI...');
+
+    setStatus(
+      'Gemini 3 Pro Image is creating the OneClick production layout…',
+    );
 
     try {
-      const cloudflareInput = await prepareCloudflareReferenceImage(file);
-      const formData = new FormData();
-      formData.append('image', cloudflareInput, cloudflareInput.name);
-      formData.append('pattern', 'production-black');
-      formData.append('quality', mapQualityToApi(quality));
-      formData.append('aspectRatio', '4:3');
-      formData.append('customizationPrompt', ONECLICK_MASTER_COMMAND);
+      const result =
+        await runImageWorkflow({
+          image: file,
+          workflow: 'oneclick',
+          pattern:
+            'production-black',
+          quality:
+            mapQualityToApi(
+              quality,
+            ),
+          aspectRatio:
+            '4:3',
+        });
 
-      const response = await fetch('/api/vector-generation', {
-        method: 'POST',
-        body: formData,
-      });
+      setStatus(
+        'Automatic production-layout validation is running locally…',
+      );
 
-      const payload = await response.json();
-      if (!response.ok) {
-        throw new Error(payload?.error || 'Vector generation failed.');
+      const validation =
+        await validateProductionLayout(
+          result.dataUrl,
+        );
+
+      setGeneratedPreview(
+        result.dataUrl,
+      );
+
+      if (
+        result.usedFallback
+      ) {
+        setStatus(
+          validation.valid
+            ? `OneClick complete · Cloudflare fallback · ${result.model} · validation passed.`
+            : `Cloudflare fallback completed · ${result.model}. Review layout: ${validation.note}`,
+        );
+      } else {
+        setStatus(
+          validation.valid
+            ? 'OneClick complete · Gemini 3 Pro Image · validation passed → vector engine ready.'
+            : `Gemini 3 Pro Image completed. Review layout before production: ${validation.note}`,
+        );
       }
-
-      if (!payload?.imageDataUrl) {
-        throw new Error('No generated output was returned by the AI route.');
-      }
-
-      setGeneratedPreview(payload.imageDataUrl);
-      setStatus('Production vector layout generated. You can now preview and download it.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Generation failed.');
-      setStatus('Generation did not complete.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Generation failed.',
+      );
+
+      setStatus(
+        'Generation did not complete.',
+      );
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(
+        false,
+      );
     }
   };
 
-  const handleDownload = async () => {
+const handleDownload = async () => {
     if (!generatedPreview) {
       setError('Generate an output first.');
       return;
@@ -217,7 +247,7 @@ export function OneClickCreationPage() {
               <div className="mt-5 flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  onClick={handleGenerate}
+                  onClick={() => void handleGenerate()}
                   disabled={isGenerating}
                   className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(90deg,#3368ff,#8a48ff)] px-6 py-3 text-base font-semibold text-white shadow-[0_12px_30px_rgba(77,93,255,0.35)] transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
                 >
@@ -411,16 +441,29 @@ function mapQualityToApi(quality: Quality) {
 }
 
 async function downloadFromDataUrl(dataUrl: string, format: DownloadFormat, baseName: string) {
-  if (format === 'pdf') {
-    const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1024, 768] });
-    pdf.addImage(dataUrl, 'PNG', 0, 0, 1024, 768);
-    pdf.save(`${baseName}.pdf`);
-    return;
-  }
+  if (format === 'svg' || format === 'pdf') {
+    const svg = await traceImageToSvg(dataUrl, '4k');
 
-  if (format === 'svg') {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200"><rect width="1600" height="1200" fill="#000"/><image href="${dataUrl}" x="0" y="0" width="1600" height="1200" preserveAspectRatio="xMidYMid meet"/></svg>`;
-    triggerBlobDownload(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${baseName}.svg`);
+    if (format === 'svg') {
+      triggerBlobDownload(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${baseName}.svg`);
+      return;
+    }
+
+    const [{ jsPDF }, svgModule] = await Promise.all([import('jspdf'), import('svg2pdf.js')]);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svg, 'image/svg+xml');
+    const svgElement = doc.documentElement as unknown as SVGElement;
+    const viewBox = svgElement.getAttribute('viewBox')?.split(/\s+/).map(Number) || [0, 0, 1600, 1200];
+    const width = Math.max(1, viewBox[2] || 1600);
+    const height = Math.max(1, viewBox[3] || 1200);
+    const pdf = new jsPDF({
+      orientation: width >= height ? 'landscape' : 'portrait',
+      unit: 'pt',
+      format: [width, height],
+      compress: true,
+    });
+    await svgModule.svg2pdf(svgElement, pdf, { x: 0, y: 0, width, height });
+    pdf.save(`${baseName}.pdf`);
     return;
   }
 

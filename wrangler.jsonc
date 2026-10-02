@@ -3,12 +3,26 @@
   "name": "my-jersey-production-studio",
   "main": "./build/sites-worker.ts",
   "compatibility_date": "2026-05-15",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "workers_dev": true,
   "ai": {
     "binding": "AI"
   },
+  "r2_buckets": [
+    {
+      "binding": "my_jersey_ai_inputs",
+      "bucket_name": "my-jersey-ai-inputs",
+      "remote": true
+    }
+  ],
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "IMAGEGPT_HOST": "the-oe1n.imagegpt.host",
+    "IMAGEGPT_PROJECT": "the-oe1n",
+    "IMAGEGPT_INPUT_BASE_URL": "https://pub-f473e32f703644f4a7d4987ac0ebb871.r2.dev"
   }
 }

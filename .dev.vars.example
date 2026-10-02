@@ -1,0 +1,5 @@
+# Optional AI provider for local Wrangler development only.
+# Copy this file to .dev.vars and fill it locally. Never commit .dev.vars.
+AI_API_KEY=
+AI_BASE_URL=
+AI_MODEL=

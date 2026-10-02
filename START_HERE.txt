@@ -1,0 +1,14 @@
+GitHub repository: nafiulnahid17/my-jersey-production-studio
+Source commit: 36b924437440b7a20d388d11bffd60a24f49fb9a
+Source tree: d4b76fe56725a17babb469a99b4386c74c05c4d7
+
+Extract the complete folder. For Windows, run DEPLOY_TO_CLOUDFLARE.cmd from your already-logged-in CMD. It installs dependencies, builds and deploys the included source without downloading another checkout.
+
+Manual commands:
+  npx --yes pnpm@11.25.0 install --frozen-lockfile
+  npx --yes pnpm@11.25.0 run build:cloudflare
+  npx --yes pnpm@11.25.0 exec wrangler deploy --config dist/server/wrangler.json
+
+Node.js 22.13 or newer is required; the Cloudflare build is configured for Node 24. The cloud deployment is not included in this ZIP. AI provider credentials are not configured; core local conversion/editing/export remain available. See README.md for capabilities and production limits.
+
+The source build, Wrangler dry run and local Worker HTTP routes/assets passed verification. Windows batch execution has not been run in this Linux environment.

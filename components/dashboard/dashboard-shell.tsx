@@ -33,6 +33,7 @@ import {
   X,
 } from 'lucide-react';
 import { useStudioSession } from '@/components/auth/studio-session';
+import { JerseyOSControlNav } from '@/components/navigation/jerseyos-control-nav';
 
 type ToolCategory = 'AI Powered Tools' | 'Elements Tools' | 'Emergency Tools';
 
@@ -158,38 +159,12 @@ export function DashboardShell() {
   return (
     <main className={`min-h-screen transition-colors duration-300 ${pageClass}`}>
       <div className="mx-auto flex min-h-screen max-w-[1920px]">
-        <aside className={`hidden w-[286px] shrink-0 border-r p-5 xl:block ${sideClass}`}>
-          <Brand dark={dark} />
-          <nav className="mt-7 space-y-1.5">
-            {sidebarPrimary.map((item) => (
-              <NavItem key={item.label} {...item} active={item.href === '/'} dark={dark} onFeatureClick={featureClick} />
-            ))}
-          </nav>
-          <div className={`my-5 h-px ${dark ? 'bg-white/10' : 'bg-slate-200'}`} />
-          <nav className="space-y-1.5">
-            {sidebarSecondary.map((item) => (
-              <NavItem key={item.label} {...item} dark={dark} onFeatureClick={featureClick} />
-            ))}
-          </nav>
-
-          <a
-            href="/upgrade"
-            onClick={(event) => featureClick(event, '/upgrade')}
-            className={`mt-7 block rounded-[22px] border p-4 transition hover:-translate-y-0.5 ${
-              dark
-                ? 'border-amber-400/30 bg-[linear-gradient(180deg,rgba(110,67,4,.30),rgba(65,41,4,.18))]'
-                : 'border-amber-300 bg-amber-50'
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <Crown className="mt-0.5 h-6 w-6 text-amber-400" />
-              <div>
-                <div className="font-bold">Upgrade to Pro</div>
-                <div className={`mt-1 text-sm leading-5 ${muted}`}>Premium export and workflow options.</div>
-              </div>
-            </div>
-          </a>
-        </aside>
+        <JerseyOSControlNav
+          dark={dark}
+          theme={theme}
+          onThemeChange={setTheme}
+          onNavigate={featureClick}
+        />
 
         <section className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
           <div className={`min-h-[calc(100vh-24px)] rounded-[30px] border p-4 shadow-[0_28px_100px_rgba(0,0,0,.16)] sm:p-5 lg:p-6 ${shellClass}`}>
@@ -430,27 +405,19 @@ export function DashboardShell() {
       </div>
 
       {menuOpen ? (
-        <HamburgerMenu
-          dark={dark}
-          displayName={displayName}
-          displayRole={displayRole}
-          initials={initials}
-          authenticated={session.authenticated}
-          profileReady={Boolean(session.profile)}
-          onClose={() => setMenuOpen(false)}
-          onFeatureClick={featureClick}
-          onLogin={() => {
-            setMenuOpen(false);
-            session.openLogin();
-          }}
-          onCompleteProfile={() => {
-            setMenuOpen(false);
-            session.openProfile();
-          }}
-          onLogout={() => void session.logout()}
-        />
-      ) : null}
-    </main>
+        <div className="fixed inset-0 z-[90] bg-[#020812]/82 backdrop-blur-xl xl:hidden">
+          <div className="h-full max-w-[390px] shadow-[25px_0_80px_rgba(0,0,0,.45)]">
+            <JerseyOSControlNav
+              dark={dark}
+              drawer
+              theme={theme}
+              onThemeChange={setTheme}
+              onClose={() => setMenuOpen(false)}
+              onNavigate={featureClick}
+            />
+          </div>
+        </div>
+      ) : null}    </main>
   );
 }
 

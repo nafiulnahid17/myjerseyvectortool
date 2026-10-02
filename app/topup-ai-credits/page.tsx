@@ -116,7 +116,7 @@ export default function TopupAiCreditsPage() {
     <main className={styles.page}>
       <div className={styles.appShell}>
         <aside className={styles.sidebar}>
-          <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className={styles.brand} style={{ objectFit: "contain" }} />
+          <img src="/brand/jerseyos-logo.png" alt="JerseyOS" className={styles.brand} style={{ objectFit: "contain" }} />
 
           <nav className={styles.nav}>
             <NavItem href="/" icon="⌂">Dashboard</NavItem>

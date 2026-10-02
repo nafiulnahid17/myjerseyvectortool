@@ -38,6 +38,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { runImageWorkflow } from '@/lib/ai/imagegpt-browser';
 import { VectorCustomizeEditor } from '@/components/image-vector/vector-customize-editor';
+import { JerseyOSControlNav } from '@/components/navigation/jerseyos-control-nav';
 import {
   editableSvgToAiBlob,
   editableSvgToEpsBlob,
@@ -147,6 +148,7 @@ export function ImageToVectorStudio() {
   const inputRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
   const [phase, setPhase] = useState<StudioPhase>('setup');
+  const [navOpen, setNavOpen] = useState(false);
   const [sourceFile, setSourceFile] = useState<File | null>(null);
   const [sourceUrl, setSourceUrl] = useState<string>('');
   const [pattern, setPattern] = useState<PatternId | null>(null);
@@ -492,12 +494,17 @@ async function buildEditableVectorFiles() {
   return (
     <main className="min-h-screen bg-[#020812] text-white">
       <div className="mx-auto flex min-h-screen max-w-[1900px]">
-        <StudioSidebar />
+        <JerseyOSControlNav dark />
 
         <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-white/10 bg-[#07111f]/90 px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,.28)] backdrop-blur-xl">
             <div className="flex min-w-0 items-center gap-3">
-              <button className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.03] xl:hidden">
+              <button
+                type="button"
+                onClick={() => setNavOpen(true)}
+                className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.03] xl:hidden"
+                aria-label="Open JerseyOS navigation"
+              >
                 <Menu className="h-5 w-5" />
               </button>
               <div>
@@ -613,6 +620,14 @@ async function buildEditableVectorFiles() {
         </div>
       </div>
 
+      {navOpen ? (
+        <div className="fixed inset-0 z-[90] bg-[#020812]/84 backdrop-blur-xl xl:hidden">
+          <div className="h-full max-w-[390px] shadow-[25px_0_80px_rgba(0,0,0,.45)]">
+            <JerseyOSControlNav dark drawer onClose={() => setNavOpen(false)} />
+          </div>
+        </div>
+      ) : null}
+
       <input
         ref={inputRef}
         className="hidden"
@@ -628,106 +643,6 @@ async function buildEditableVectorFiles() {
         onChange={(event) => setLogoFile(event.target.files?.[0] || null)}
       />
     </main>
-  );
-}
-
-function StudioSidebar() {
-  const groups = [
-    {
-      title: 'AI Powered Tools',
-      items: [
-        { href: '/image-to-vector', label: 'VectorForge', icon: ImageIcon, active: true },
-        { href: '/oneclick-creation', label: 'AutoPilot', icon: WandSparkles },
-        { href: '/edit-existing-file', label: 'VectorLab', icon: SquarePen },
-        { href: '/mockup-generator', label: 'Showcase AI', icon: PackageOpen },
-        { href: '/frontscan', label: 'FrontScan', icon: Search },
-        { href: '/batchforge', label: 'BatchForge', icon: Layers3 },
-        { href: '/ordersheet', label: 'OrderSheet', icon: FileCog },
-      ],
-    },
-    {
-      title: 'Elements Tools',
-      items: [
-        { href: '/design-elements', label: 'AssetForge', icon: Layers3 },
-        { href: '/templates', label: 'DesignVault', icon: FileImage },
-        { href: '/file-converter', label: 'ConvertX', icon: FileCog },
-        { href: '/exportpack', label: 'ExportPack', icon: PackageOpen },
-      ],
-    },
-    {
-      title: 'Emergency Tools',
-      items: [
-        { href: '/backup', label: 'RescueX', icon: ShieldCheck },
-        { href: '/manual-vector-tracing', label: 'TraceDesk', icon: SquarePen },
-        { href: '/colour-editor', label: 'ColorDesk', icon: Layers3 },
-        { href: '/manual-production-cut-setup', label: 'CutPrep', icon: FileImage },
-      ],
-    },
-  ];
-
-  return (
-    <aside className="sticky top-0 hidden h-screen w-[245px] shrink-0 overflow-y-auto border-r border-white/10 bg-[linear-gradient(180deg,#06101d,#020711)] p-4 xl:block">
-      <div className="px-2 pb-5 pt-2">
-        <div className="flex items-center gap-3">
-          <img
-            src="/brand/jerseyos-logo.png"
-            alt="JerseyOS"
-            className="h-14 w-14 shrink-0 object-contain"
-          />
-          <div className="min-w-0">
-            <p className="text-[1.15rem] font-black leading-none tracking-wide">JerseyOS</p>
-            <p className="mt-1 max-w-[145px] text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-amber-200/70">
-              AI-Powered Jersey Production OS
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <nav className="space-y-1.5">
-        <SideLink href="/" label="Dashboard" icon={Home} />
-        <SideLink href="/new-project" label="New Project" icon={Plus} />
-      </nav>
-
-      <div className="my-5 h-px bg-white/10" />
-
-      <div className="space-y-5 pb-6">
-        {groups.map((group) => (
-          <section key={group.title}>
-            <p className="mb-2 px-3 text-[10px] font-black uppercase tracking-[0.18em] text-sky-400">
-              {group.title}
-            </p>
-            <nav className="space-y-1.5">
-              {group.items.map((item) => (
-                <SideLink key={item.label} {...item} />
-              ))}
-            </nav>
-          </section>
-        ))}
-
-        <div className="h-px bg-white/10" />
-
-        <nav className="space-y-1.5">
-          <SideLink href="/settings" label="Settings" icon={Settings} />
-          <SideLink href="/help-support" label="Help & Support" icon={CircleHelp} />
-        </nav>
-      </div>
-    </aside>
-  );
-}
-
-function SideLink({ href, label, icon: Icon, active }: { href: string; label: string; icon: ComponentType<{ className?: string }>; active?: boolean }) {
-  return (
-    <a
-      href={href}
-      className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-sm transition ${
-        active
-          ? 'border-sky-400/35 bg-[linear-gradient(90deg,rgba(8,105,230,.70),rgba(10,52,101,.55))] text-white'
-          : 'border-transparent text-white/78 hover:border-white/10 hover:bg-white/[0.04] hover:text-white'
-      }`}
-    >
-      <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/[0.04]"><Icon className="h-4 w-4" /></span>
-      {label}
-    </a>
   );
 }
 

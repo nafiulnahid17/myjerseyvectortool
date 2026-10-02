@@ -26,17 +26,6 @@ export function ControlCenterShell({ children }: { children: ReactNode }) {
         <JerseyOSControlNav dark={dark} theme={theme} onThemeChange={setTheme} />
 
         <section className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className={dark
-              ? 'mb-4 grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.04] xl:hidden'
-              : 'mb-4 grid h-11 w-11 place-items-center rounded-2xl border border-slate-200 bg-white xl:hidden'
-            }
-            aria-label="Open JerseyOS navigation"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
           {children}
         </section>
       </div>

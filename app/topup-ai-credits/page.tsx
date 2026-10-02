@@ -116,7 +116,7 @@ export default function TopupAiCreditsPage() {
     <main className={styles.page}>
       <div className={styles.appShell}>
         <aside className={styles.sidebar}>
-          <img src="/topup-exact/brand-lockup.png" alt="My Jersey Studio" className={styles.brand} />
+          <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className={styles.brand} style={{ objectFit: "contain" }} />
 
           <nav className={styles.nav}>
             <NavItem href="/" icon="⌂">Dashboard</NavItem>
@@ -149,7 +149,7 @@ export default function TopupAiCreditsPage() {
               <button className={styles.iconButton} type="button" aria-label="Notifications">♧<span className={styles.notificationDot} /></button>
               <div className={styles.avatar}>M</div>
               <div className={styles.profileText}>
-                <strong>My Jersey Studio</strong>
+                <strong>JerseyOS</strong>
                 <span>Creator</span>
               </div>
               <span className={styles.chevron}>⌄</span>
@@ -378,6 +378,9 @@ export default function TopupAiCreditsPage() {
                 </a>
               </Panel>
             </aside>
+          </div>
+          <div style={{ marginTop: 18, padding: "12px 0", textAlign: "center", fontSize: 12, opacity: 0.45 }}>
+            Copyright 2027- 2028 @ My Jersey
           </div>
         </section>
       </div>

@@ -22,7 +22,7 @@
   <circle cx="520" cy="360" r="18" fill="#22c8ff"/>
   <circle cx="640" cy="250" r="18" fill="#22c8ff"/>
   <path d="M145 475l40-40M320 440l40-40M500 380l40-40M620 270l40-40" stroke="#ffffff" stroke-width="5" opacity=".6"/>
-  <text x="80" y="620" fill="white" font-size="46" font-family="Arial, sans-serif" font-weight="800">Manual Production / Cut Setup</text>
+  <text x="80" y="620" fill="white" font-size="46" font-family="Arial, sans-serif" font-weight="800">CutPrep</text>
   <text x="82" y="670" fill="#7dd3fc" font-size="23" font-family="Arial, sans-serif" font-weight="700" letter-spacing="4">CUT + PANEL LAYOUT</text>
   <text x="82" y="728" fill="#94a3b8" font-size="20" font-family="Arial, sans-serif">MY JERSEY STUDIO</text>
 </svg>

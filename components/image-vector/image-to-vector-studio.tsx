@@ -501,7 +501,7 @@ async function buildEditableVectorFiles() {
                 <Menu className="h-5 w-5" />
               </button>
               <div>
-                <p className="text-sm font-medium text-sky-400">My Jersey Studio</p>
+                <p className="text-sm font-medium text-sky-400">JerseyOS</p>
                 <h1 className="truncate text-lg font-bold sm:text-xl">VectorForge</h1>
               </div>
             </div>
@@ -669,12 +669,16 @@ function StudioSidebar() {
     <aside className="sticky top-0 hidden h-screen w-[245px] shrink-0 overflow-y-auto border-r border-white/10 bg-[linear-gradient(180deg,#06101d,#020711)] p-4 xl:block">
       <div className="px-2 pb-5 pt-2">
         <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-[linear-gradient(135deg,#f8fbff,#d8edff)] text-xl font-black text-[#07101f]">
-            <span>M<span className="text-[#117bff]">J</span></span>
-          </div>
-          <div>
-            <p className="text-[1.15rem] font-black leading-none tracking-wide">MY JERSEY</p>
-            <p className="mt-1 text-xs font-bold tracking-[0.35em] text-[#1589ff]">STUDIO</p>
+          <img
+            src="/brand/jerseyos-logo.svg"
+            alt="JerseyOS"
+            className="h-14 w-14 shrink-0 object-contain"
+          />
+          <div className="min-w-0">
+            <p className="text-[1.15rem] font-black leading-none tracking-wide">JerseyOS</p>
+            <p className="mt-1 max-w-[145px] text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] text-amber-200/70">
+              AI-Powered Jersey Production OS
+            </p>
           </div>
         </div>
       </div>
@@ -1448,7 +1452,7 @@ function addEditableMetadata(svg: string) {
   const ns = 'http://www.w3.org/2000/svg';
 
   const title = document.createElementNS(ns, 'title');
-  title.textContent = 'My Jersey Studio — Editable Production Vector';
+  title.textContent = 'JerseyOS — Editable Production Vector';
   root.insertBefore(title, root.firstChild);
 
   const desc = document.createElementNS(ns, 'desc');

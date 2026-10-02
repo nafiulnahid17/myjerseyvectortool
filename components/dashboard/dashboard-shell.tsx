@@ -114,6 +114,15 @@ export function DashboardShell() {
   }, []);
 
   useEffect(() => {
+    const onThemeChange = (event: Event) => {
+      const next = (event as CustomEvent<'dark' | 'light'>).detail;
+      if (next === 'dark' || next === 'light') setTheme(next);
+    };
+    window.addEventListener('jerseyos-theme-change', onThemeChange);
+    return () => window.removeEventListener('jerseyos-theme-change', onThemeChange);
+  }, []);
+
+  useEffect(() => {
     window.localStorage.setItem('mj_dashboard_theme', theme);
     document.documentElement.dataset.mjTheme = theme;
   }, [theme]);
@@ -170,15 +179,6 @@ export function DashboardShell() {
           <div className={`min-h-[calc(100vh-24px)] rounded-[30px] border p-4 shadow-[0_28px_100px_rgba(0,0,0,.16)] sm:p-5 lg:p-6 ${shellClass}`}>
             <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex min-w-0 flex-1 items-center gap-3">
-                <button
-                  onClick={() => setMenuOpen(true)}
-                  className={`grid h-13 w-13 shrink-0 place-items-center rounded-2xl border transition hover:-translate-y-0.5 xl:hidden ${
-                    dark ? 'border-sky-400/25 bg-[#07172b] text-sky-300' : 'border-sky-200 bg-sky-50 text-sky-600'
-                  }`}
-                  aria-label="Open hamburger menu"
-                >
-                  <Menu className="h-6 w-6" />
-                </button>
                 <img
                   src="/brand/jerseyos-logo.png"
                   alt="JerseyOS"

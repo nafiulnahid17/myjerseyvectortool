@@ -1,0 +1,81 @@
+$ vinext build
+
+  vinext build  (Vite 8.0.13)
+
+[34m[1/5] analyze client references...[39m
+[2Ktransforming...✓ 286 modules transformed.
+rendering chunks...
+Using secrets defined in .dev.vars
+[33m[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+  - rsc:virtual-client-package (30%)
+  - vinext:rsc-client-reference-loaders (18%)
+  - vinext:image-imports (15%)
+  - alias (13%)
+  - vinext:og-inline-fetch-assets (10%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[32m✓ built in 10.85s[39m
+[34m[2/5] analyze server references...[39m
+[2Ktransforming...✓ 203 modules transformed.
+rendering chunks...
+[32m✓ built in 2.66s[39m
+[34m[3/5] build rsc environment...[39m
+[2Ktransforming...✓ 283 modules transformed.
+rendering chunks...
+Using secrets defined in .dev.vars
+computing gzip size...
+[32m✓ built in 1.63s[39m
+[34m[4/5] build client environment...[39m
+[2Ktransforming...✓ 2121 modules transformed.
+rendering chunks...
+computing gzip size...
+[33m[33m[PLUGIN_TIMINGS] [0mYour build spent significant time in plugins. Here is a breakdown:
+  - vinext:middleware-server-only (20%)
+  - vinext:css-data-url (15%)
+  - alias (9%)
+  - vinext:og-inline-fetch-assets (8%)
+  - rsc:virtual-client-package (7%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+[39m
+[32m✓ built in 9.78s[39m
+[34m[5/5] build ssr environment...[39m
+[2Ktransforming...✓ 365 modules transformed.
+rendering chunks...
+computing gzip size...
+[32m✓ built in 2.34s[39m
+[0m
+  Route (app)
+  ┌ ? /                       
+  ├ ? /about-us               
+  ├ ? /ai-assistant           
+  ├ λ /api/ai                 
+  ├ λ /api/health             
+  ├ λ /api/studio-auth/login  
+  ├ λ /api/studio-auth/logout 
+  ├ λ /api/studio-auth/session
+  ├ λ /api/vector-generation  
+  ├ ? /backup                 
+  ├ ? /design-elements        
+  ├ ? /edit-existing-file     
+  ├ ? /file-converter         
+  ├ ? /help-support           
+  ├ ? /image-to-vector        
+  ├ ? /mockup-generator       
+  ├ ? /new-project            
+  ├ ? /oneclick-creation      
+  ├ ? /projects               
+  ├ ? /route-check            
+  ├ ? /settings               
+  ├ ? /templates              
+  ├ ? /tools                  
+  ├ ? /topup-ai-credits       
+  └ ? /upgrade                
+
+  λ API  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+

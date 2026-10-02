@@ -39,9 +39,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { runImageWorkflow } from '@/lib/ai/imagegpt-browser';
 import type {
   AspectRatioId,
-  ExportFormat,
   ExportQuality,
-  GenerationResponse,
   PatternId,
   PatternPreset,
   QualityId,
@@ -75,26 +73,12 @@ const qualities: Array<{ id: QualityId; title: string; subtitle: string }> = [
 ];
 
 const aspects: AspectRatioId[] = ['4:3', '1:1', '9:16', '16:9'];
-const exportFormats: Array<{ id: ExportFormat; title: string; subtitle: string }> = [
-  { id: 'svg', title: 'SVG', subtitle: 'Traced vector' },
-  { id: 'ai', title: 'AI', subtitle: 'Illustrator-compatible' },
-  { id: 'pdf', title: 'PDF', subtitle: 'Print ready' },
-  { id: 'png', title: 'PNG', subtitle: 'Lossless image' },
-  { id: 'jpeg', title: 'JPEG', subtitle: 'Universal image' },
-];
-const exportQualities: Array<{ id: ExportQuality; title: string }> = [
-  { id: '4k', title: '4K' },
-  { id: 'high', title: 'High' },
-  { id: 'medium', title: 'Medium' },
-  { id: 'low', title: 'Low' },
-];
-
 const steps = [
   { key: 'setup', number: 1, label: 'Upload & Settings' },
   { key: 'result', number: 2, label: 'Generate' },
   { key: 'customize', number: 3, label: 'Customize' },
   { key: 'preview', number: 4, label: 'Preview' },
-  { key: 'download', number: 5, label: 'Download' },
+  { key: 'download', number: 5, label: 'Editable Vector' },
 ] as const;
 
 const phaseRank: Record<StudioPhase, number> = {
@@ -170,9 +154,11 @@ export function ImageToVectorStudio() {
   const [customPrompt, setCustomPrompt] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState<'2d' | '3d'>('2d');
-  const [exportFormat, setExportFormat] = useState<ExportFormat>('svg');
-  const [exportQuality, setExportQuality] = useState<ExportQuality>('4k');
-  const [exporting, setExporting] = useState(false);
+  const [vectorState, setVectorState] = useState<'idle' | 'building' | 'ready'>('idle');
+  const [vectorProgress, setVectorProgress] = useState(0);
+  const [vectorStatus, setVectorStatus] = useState('');
+  const [editableSvg, setEditableSvg] = useState('');
+  const [editableAiBlob, setEditableAiBlob] = useState<Blob | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -205,6 +191,11 @@ export function ImageToVectorStudio() {
     setSourceFile(file);
     setSourceUrl(URL.createObjectURL(file));
     setGeneratedUrl('');
+    setVectorState('idle');
+    setVectorProgress(0);
+    setVectorStatus('');
+    setEditableSvg('');
+    setEditableAiBlob(null);
     setError('');
     setStatusMessage('');
   }
@@ -354,20 +345,79 @@ export function ImageToVectorStudio() {
     }
   }
 
-async function downloadCurrent() {
+async function buildEditableVectorFiles() {
     if (!visibleOutput) {
-      setError('Generate or prepare an output before downloading.');
+      setError('Generate and preview an output before creating editable vector files.');
       return;
     }
-    setExporting(true);
+
+    setPhase('download');
+    setVectorState('building');
+    setVectorProgress(8);
+    setVectorStatus('Preparing the final production artwork…');
+    setEditableSvg('');
+    setEditableAiBlob(null);
     setError('');
+
     try {
-      await exportArtwork(visibleOutput, exportFormat, exportQuality, selectedPattern?.background === 'transparent');
-    } catch (downloadError) {
-      setError(downloadError instanceof Error ? downloadError.message : 'Export failed.');
-    } finally {
-      setExporting(false);
+      await nextPaint();
+
+      setVectorProgress(22);
+      setVectorStatus('Tracing artwork into editable vector paths…');
+      const tracedSvg = await traceSvg(
+        visibleOutput,
+        '4k',
+        selectedPattern?.background === 'transparent',
+      );
+
+      await nextPaint();
+      setVectorProgress(58);
+      setVectorStatus('Separating paths into the 8 editable jersey component groups…');
+      const layeredSvg = await groupEditableSvg(tracedSvg);
+
+      await nextPaint();
+      setVectorProgress(78);
+      setVectorStatus('Preparing editable typography outlines and Illustrator layers…');
+      const finalSvg = addEditableMetadata(layeredSvg);
+
+      await nextPaint();
+      setVectorProgress(90);
+      setVectorStatus('Building the Illustrator-compatible editable AI file…');
+      const aiBlob = await vectorPdfBlob(finalSvg);
+
+      setEditableSvg(finalSvg);
+      setEditableAiBlob(aiBlob);
+      setVectorProgress(100);
+      setVectorStatus('Editable vector files are ready.');
+      setVectorState('ready');
+    } catch (vectorError) {
+      setVectorState('idle');
+      setVectorProgress(0);
+      setVectorStatus('');
+      setError(
+        vectorError instanceof Error
+          ? vectorError.message
+          : 'Could not create editable vector files.',
+      );
     }
+  }
+
+  function downloadEditableSvg() {
+    if (!editableSvg) return;
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    downloadBlob(
+      new Blob([editableSvg], { type: 'image/svg+xml;charset=utf-8' }),
+      `my-jersey-editable-vector-${stamp}.svg`,
+    );
+  }
+
+  function downloadEditableAi() {
+    if (!editableAiBlob) return;
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    downloadBlob(
+      new Blob([editableAiBlob], { type: 'application/pdf' }),
+      `my-jersey-editable-${stamp}.ai`,
+    );
   }
 
   const currentStep = phaseRank[phase];
@@ -441,7 +491,6 @@ async function downloadCurrent() {
                 aspectRatio={aspectRatio}
                 afterEdit={resultMode === 'edit'}
                 onBack={() => setPhase(resultMode === 'edit' ? 'customize' : 'setup')}
-                onDownload={() => setPhase('download')}
                 onCustomize={() => setPhase('customize')}
                 onPreview={() => setPhase('preview')}
               />
@@ -471,22 +520,20 @@ async function downloadCurrent() {
                 outputUrl={visibleOutput}
                 mode={previewMode}
                 onMode={setPreviewMode}
-                onEdit={() => setPhase('customize')}
-                onNext={() => setPhase('download')}
+                onNext={() => void buildEditableVectorFiles()}
               />
             ) : null}
 
             {phase === 'download' ? (
               <DownloadPhase
                 outputUrl={visibleOutput}
-                format={exportFormat}
-                quality={exportQuality}
-                exporting={exporting}
+                state={vectorState}
+                progress={vectorProgress}
+                status={vectorStatus}
                 previewOnly={isPreviewOnly}
-                onFormat={setExportFormat}
-                onQuality={setExportQuality}
                 onBack={() => setPhase('preview')}
-                onDownload={() => void downloadCurrent()}
+                onDownloadSvg={downloadEditableSvg}
+                onDownloadAi={downloadEditableAi}
               />
             ) : null}
           </div>
@@ -745,7 +792,6 @@ function ResultPhase(props: {
   aspectRatio: AspectRatioId;
   afterEdit: boolean;
   onBack: () => void;
-  onDownload: () => void;
   onCustomize: () => void;
   onPreview: () => void;
 }) {
@@ -783,8 +829,8 @@ function ResultPhase(props: {
             <button onClick={props.onCustomize} className="inline-flex w-full items-center justify-center gap-2 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 font-bold">
               <Pencil className="h-5 w-5" /> Customize <ArrowRight className="h-5 w-5" />
             </button>
-            <button onClick={props.onDownload} className="inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/12 bg-white/[0.04] px-5 py-4 font-semibold text-white/85">
-              <Download className="h-5 w-5" /> Download
+            <button onClick={props.onPreview} className="inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/12 bg-white/[0.04] px-5 py-4 font-semibold text-white/85">
+              <ImageIcon className="h-5 w-5" /> Preview <ArrowRight className="h-5 w-5" />
             </button>
           </>
         )}
@@ -859,23 +905,35 @@ function CustomizePhase(props: {
   );
 }
 
-function PreviewPhase(props: { outputUrl: string; mode: '2d' | '3d'; onMode: (mode: '2d' | '3d') => void; onEdit: () => void; onNext: () => void }) {
+function PreviewPhase(props: {
+  outputUrl: string;
+  mode: '2d' | '3d';
+  onMode: (mode: '2d' | '3d') => void;
+  onNext: () => void;
+}) {
   return (
     <section className="mx-auto max-w-6xl">
-      <Panel number="4" title="Preview Design" subtitle="Inspect the final artwork in flat 2D or a perspective review mode before export.">
+      <Panel number="4" title="Preview Design" subtitle="Inspect the final production artwork before generating the editable vector package.">
         <div className="mb-4 flex flex-wrap gap-2">
           <button onClick={() => props.onMode('2d')} className={`rounded-2xl border px-4 py-2 text-sm font-semibold ${props.mode === '2d' ? 'border-sky-400 bg-sky-500/10 text-white' : 'border-white/10 bg-white/[0.025] text-white/55'}`}>2D Preview</button>
           <button onClick={() => props.onMode('3d')} className={`rounded-2xl border px-4 py-2 text-sm font-semibold ${props.mode === '3d' ? 'border-sky-400 bg-sky-500/10 text-white' : 'border-white/10 bg-white/[0.025] text-white/55'}`}>3D Review</button>
         </div>
+
         <div className="min-h-[560px] overflow-hidden rounded-[26px] border border-white/10 bg-[radial-gradient(circle_at_center,rgba(18,106,210,.15),transparent_48%),#02060d] p-6 [perspective:1300px]">
           <div className={`flex h-full min-h-[510px] items-center justify-center transition duration-500 ${props.mode === '3d' ? '[transform:rotateY(-13deg)_rotateX(5deg)_scale(.90)] drop-shadow-[30px_35px_35px_rgba(0,0,0,.48)]' : ''}`}>
             {props.outputUrl ? <img src={props.outputUrl} alt="Final production preview" className="max-h-[500px] max-w-full rounded-xl object-contain" /> : <EmptyPreview />}
           </div>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <button onClick={props.onEdit} className="inline-flex items-center justify-center gap-2 rounded-[18px] border border-white/12 bg-white/[0.03] px-5 py-4 font-semibold"><RefreshCcw className="h-5 w-5" /> Edit Again</button>
-          <button onClick={props.onNext} className="inline-flex items-center justify-center gap-2 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 font-bold">Go to Next Phase <ArrowRight className="h-5 w-5" /></button>
-        </div>
+
+        <button
+          onClick={props.onNext}
+          disabled={!props.outputUrl}
+          className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-6 py-4 text-lg font-black shadow-[0_16px_36px_rgba(8,117,255,.26)] transition disabled:cursor-not-allowed disabled:opacity-35"
+        >
+          <Download className="h-5 w-5" />
+          Download Editable SVG File
+          <ArrowRight className="h-5 w-5" />
+        </button>
       </Panel>
     </section>
   );
@@ -883,51 +941,108 @@ function PreviewPhase(props: { outputUrl: string; mode: '2d' | '3d'; onMode: (mo
 
 function DownloadPhase(props: {
   outputUrl: string;
-  format: ExportFormat;
-  quality: ExportQuality;
-  exporting: boolean;
+  state: 'idle' | 'building' | 'ready';
+  progress: number;
+  status: string;
   previewOnly: boolean;
-  onFormat: (format: ExportFormat) => void;
-  onQuality: (quality: ExportQuality) => void;
   onBack: () => void;
-  onDownload: () => void;
+  onDownloadSvg: () => void;
+  onDownloadAi: () => void;
 }) {
+  const stages = [
+    { label: 'Prepare final artwork', threshold: 8 },
+    { label: 'Trace editable vector paths', threshold: 22 },
+    { label: 'Separate 8 jersey component groups', threshold: 58 },
+    { label: 'Prepare editable typography outlines', threshold: 78 },
+    { label: 'Build Illustrator-compatible AI file', threshold: 90 },
+    { label: 'Vector package ready', threshold: 100 },
+  ];
+
   return (
-    <section className="grid gap-5 xl:grid-cols-[1fr_420px]">
-      <Panel number="5" title="Download Output" subtitle="Choose the export format and output quality before downloading.">
+    <section className="grid gap-5 xl:grid-cols-[1fr_440px]">
+      <Panel number="5" title="Editable Vector Creation" subtitle="The final preview is converted into separately grouped editable vector artwork.">
         <ArtworkStage url={props.outputUrl} transparent={false} previewOnly={props.previewOnly} compact />
-        {props.previewOnly ? <div className="mt-4 rounded-2xl border border-amber-400/20 bg-amber-500/8 px-4 py-3 text-sm leading-6 text-amber-100/75">The OpenAI generation engine is not connected, so this download would export the current source preview rather than a generated production layout.</div> : null}
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          <VectorFeature title="8 Editable Groups" text="Front, back, sleeves, collars and trim pieces are organized as named groups." />
+          <VectorFeature title="Editable Paths" text="Colors, shapes, logos and typography outlines remain vector path objects." />
+          <VectorFeature title="Illustrator Ready" text="SVG opens as editable vector artwork; the AI download is Illustrator-compatible vector data." />
+        </div>
       </Panel>
 
-      <div className="rounded-[28px] border border-white/10 bg-[#07111f] p-5 sm:p-6">
-        <SettingLabel title="File Format" required />
-        <div className="grid grid-cols-2 gap-2">
-          {exportFormats.map((item) => (
-            <button key={item.id} onClick={() => props.onFormat(item.id)} className={`rounded-2xl border p-3 text-left ${props.format === item.id ? 'border-sky-400 bg-sky-500/10' : 'border-white/10 bg-white/[0.025]'}`}>
-              <p className="text-sm font-bold uppercase">{item.title}</p>
-              <p className="mt-1 text-xs text-white/45">{item.subtitle}</p>
-            </button>
-          ))}
-        </div>
+      <div className="h-fit rounded-[28px] border border-white/10 bg-[#07111f] p-5 sm:p-6">
+        {props.state === 'building' ? (
+          <>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">Vector Engine</p>
+            <h2 className="mt-2 text-2xl font-black">Creating editable artwork…</h2>
+            <p className="mt-3 min-h-12 text-sm leading-6 text-white/55">{props.status}</p>
 
-        <SettingLabel title="Download Quality" required />
-        <div className="grid grid-cols-2 gap-2">
-          {exportQualities.map((item) => (
-            <button key={item.id} onClick={() => props.onQuality(item.id)} className={`rounded-2xl border px-3 py-3 text-sm font-semibold ${props.quality === item.id ? 'border-sky-400 bg-sky-500/10' : 'border-white/10 bg-white/[0.025] text-white/60'}`}>{item.title}</button>
-          ))}
-        </div>
+            <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/8">
+              <div className="h-full rounded-full bg-[linear-gradient(90deg,#0875ff,#22c8ff)] transition-all duration-500" style={{ width: `${props.progress}%` }} />
+            </div>
+            <div className="mt-2 text-right text-sm font-bold text-cyan-300">{props.progress}%</div>
 
-        <div className="mt-6 rounded-2xl border border-white/8 bg-black/20 p-4 text-sm leading-6 text-white/55">
-          SVG export uses the project&apos;s ImageTracer dependency to trace the final image into paths. PDF and AI-compatible export are built from that traced vector artwork.
-        </div>
+            <div className="mt-5 space-y-2">
+              {stages.map((stage) => {
+                const done = props.progress >= stage.threshold;
+                const active = !done && props.progress < stage.threshold;
+                return (
+                  <div key={stage.label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.025] px-4 py-3 text-sm">
+                    <span className={`grid h-7 w-7 place-items-center rounded-full ${done ? 'bg-emerald-500/15 text-emerald-300' : 'bg-sky-500/10 text-sky-300'}`}>
+                      {done ? <Check className="h-4 w-4" /> : active ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <span className="h-2 w-2 rounded-full bg-current opacity-50" />}
+                    </span>
+                    <span className={done ? 'text-white/80' : 'text-white/50'}>{stage.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        ) : props.state === 'ready' ? (
+          <>
+            <div className="flex items-center gap-3 rounded-[22px] border border-emerald-400/25 bg-emerald-500/8 p-4">
+              <span className="grid h-12 w-12 place-items-center rounded-full bg-emerald-500/15 text-emerald-300">
+                <Check className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="font-black text-emerald-100">Editable Vector Ready</p>
+                <p className="mt-1 text-xs text-emerald-100/60">Choose either editable delivery format below.</p>
+              </div>
+            </div>
 
-        <button onClick={props.onDownload} disabled={props.exporting || !props.outputUrl} className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 text-lg font-bold disabled:opacity-40">
-          {props.exporting ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-          {props.exporting ? 'Preparing Exportâ€¦' : 'Download'}
+            <div className="mt-5 space-y-3">
+              <button onClick={props.onDownloadSvg} className="inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 text-base font-black">
+                <Download className="h-5 w-5" />
+                Download Editable SVG
+              </button>
+
+              <button onClick={props.onDownloadAi} className="inline-flex w-full items-center justify-center gap-3 rounded-[18px] border border-violet-400/30 bg-violet-500/10 px-5 py-4 text-base font-black text-violet-100">
+                <FileCog className="h-5 w-5" />
+                Download Editable AI File
+              </button>
+            </div>
+
+            <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4 text-xs leading-6 text-white/48">
+              Typography from the raster artwork is preserved as editable vector outlines. Each letter can be selected and reshaped as vector paths. Live font-family editing requires OCR/font reconstruction and is not fabricated by this exporter.
+            </div>
+          </>
+        ) : (
+          <div className="text-sm text-white/55">Vector generation has not started.</div>
+        )}
+
+        <button onClick={props.onBack} disabled={props.state === 'building'} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 px-5 py-3 text-sm text-white/60 disabled:opacity-35">
+          <ArrowLeft className="h-4 w-4" /> Back to Preview
         </button>
-        <button onClick={props.onBack} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 px-5 py-3 text-sm text-white/60"><ArrowLeft className="h-4 w-4" /> Back to Preview</button>
       </div>
     </section>
+  );
+}
+
+function VectorFeature({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="rounded-2xl border border-sky-400/12 bg-sky-500/[0.04] p-4">
+      <p className="text-sm font-bold text-sky-100">{title}</p>
+      <p className="mt-1 text-xs leading-5 text-white/45">{text}</p>
+    </div>
   );
 }
 
@@ -1028,6 +1143,136 @@ async function dataUrlToFile(dataUrl: string, name: string) {
   return new File([blob], name, { type: blob.type || 'image/png' });
 }
 
+function nextPaint() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
+async function groupEditableSvg(svg: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svg, 'image/svg+xml');
+  const root = doc.documentElement;
+
+  if (root.nodeName.toLowerCase() !== 'svg') {
+    throw new Error('The vector engine returned an invalid SVG document.');
+  }
+
+  root.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  root.setAttribute('data-my-jersey-editable', 'true');
+
+  const viewBox = (root.getAttribute('viewBox') || `0 0 ${root.getAttribute('width') || 1200} ${root.getAttribute('height') || 900}`)
+    .trim()
+    .split(/[\s,]+/)
+    .map(Number);
+
+  const width = Math.max(1, viewBox[2] || 1200);
+  const height = Math.max(1, viewBox[3] || 900);
+
+  const host = document.createElement('div');
+  host.style.position = 'fixed';
+  host.style.left = '-100000px';
+  host.style.top = '0';
+  host.style.width = `${width}px`;
+  host.style.height = `${height}px`;
+  host.style.pointerEvents = 'none';
+  host.innerHTML = new XMLSerializer().serializeToString(root);
+  document.body.appendChild(host);
+
+  try {
+    const liveSvg = host.querySelector('svg');
+    if (!liveSvg) throw new Error('Could not prepare editable SVG layers.');
+
+    const ns = 'http://www.w3.org/2000/svg';
+    const layerNames = [
+      'left-sleeve',
+      'front-body',
+      'back-body',
+      'right-sleeve',
+      'front-collar',
+      'back-collar',
+      'top-trim',
+      'bottom-trim',
+      'unassigned-artwork',
+    ];
+
+    const groups = new Map<string, SVGGElement>();
+
+    for (const name of layerNames) {
+      const group = document.createElementNS(ns, 'g');
+      group.setAttribute('id', name);
+      group.setAttribute('data-layer', name);
+      group.setAttribute('aria-label', name.replaceAll('-', ' '));
+      groups.set(name, group);
+      liveSvg.appendChild(group);
+    }
+
+    const shapes = Array.from(
+      liveSvg.querySelectorAll('path, polygon, polyline, rect, circle, ellipse'),
+    ).filter((node) => !(node.parentElement?.hasAttribute('data-layer')));
+
+    for (const node of shapes) {
+      let bbox: DOMRect | SVGRect;
+      try {
+        bbox = (node as SVGGraphicsElement).getBBox();
+      } catch {
+        groups.get('unassigned-artwork')?.appendChild(node);
+        continue;
+      }
+
+      const cx = (bbox.x + bbox.width / 2) / width;
+      const cy = (bbox.y + bbox.height / 2) / height;
+
+      let layer = 'unassigned-artwork';
+
+      if (cy < 0.20 && cx >= 0.32 && cx <= 0.68) {
+        layer = 'top-trim';
+      } else if (cy > 0.78 && cx >= 0.32 && cx <= 0.68) {
+        layer = 'bottom-trim';
+      } else if (cy > 0.60 && cx >= 0.20 && cx < 0.50) {
+        layer = 'front-collar';
+      } else if (cy > 0.60 && cx >= 0.50 && cx <= 0.80) {
+        layer = 'back-collar';
+      } else if (cx < 0.25) {
+        layer = 'left-sleeve';
+      } else if (cx > 0.75) {
+        layer = 'right-sleeve';
+      } else if (cx < 0.50) {
+        layer = 'front-body';
+      } else {
+        layer = 'back-body';
+      }
+
+      groups.get(layer)?.appendChild(node);
+    }
+
+    return new XMLSerializer().serializeToString(liveSvg);
+  } finally {
+    host.remove();
+  }
+}
+
+function addEditableMetadata(svg: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svg, 'image/svg+xml');
+  const root = doc.documentElement;
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const title = document.createElementNS(ns, 'title');
+  title.textContent = 'My Jersey Studio — Editable Production Vector';
+  root.insertBefore(title, root.firstChild);
+
+  const desc = document.createElementNS(ns, 'desc');
+  desc.textContent =
+    'Eight named jersey component groups. Artwork and typography are vector paths editable in Illustrator, Inkscape and compatible vector editors.';
+  root.insertBefore(desc, title.nextSibling);
+
+  root.setAttribute('data-vector-structure', '8-component-editable-layout');
+  root.setAttribute('data-typography-mode', 'vector-outlines');
+
+  return new XMLSerializer().serializeToString(root);
+}
+
 function qualityScale(quality: ExportQuality) {
   return quality === '4k' ? 3840 : quality === 'high' ? 2560 : quality === 'medium' ? 1600 : 1024;
 }
@@ -1106,29 +1351,3 @@ async function vectorPdfBlob(svg: string) {
   await svgModule.svg2pdf(svgElement, pdf, { x: 0, y: 0, width, height });
   return pdf.output('blob');
 }
-
-async function exportArtwork(dataUrl: string, format: ExportFormat, quality: ExportQuality, transparent: boolean) {
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-  if (format === 'png' || format === 'jpeg') {
-    const canvas = await rasterCanvas(dataUrl, quality, transparent && format === 'png');
-    const mime = format === 'png' ? 'image/png' : 'image/jpeg';
-    const blob = await canvasBlob(canvas, mime, format === 'jpeg' ? 0.94 : undefined);
-    downloadBlob(blob, `my-jersey-production-${stamp}.${format === 'jpeg' ? 'jpg' : 'png'}`);
-    return;
-  }
-
-  const svg = await traceSvg(dataUrl, quality, transparent);
-  if (format === 'svg') {
-    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `my-jersey-production-${stamp}.svg`);
-    return;
-  }
-
-  const pdfBlob = await vectorPdfBlob(svg);
-  if (format === 'pdf') {
-    downloadBlob(pdfBlob, `my-jersey-production-${stamp}.pdf`);
-    return;
-  }
-
-  downloadBlob(new Blob([await pdfBlob.arrayBuffer()], { type: 'application/pdf' }), `my-jersey-production-${stamp}.ai`);
-}
-

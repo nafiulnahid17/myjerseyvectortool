@@ -235,9 +235,9 @@ async function makeAi(svg: string) {
   });
 
   pdf.setProperties({
-    title: "My Jersey Studio Editable Vector",
+    title: "JerseyOS Editable Vector",
     subject: "Illustrator-compatible editable vector artwork",
-    creator: "My Jersey Studio",
+    creator: "JerseyOS",
   });
 
   await svgModule.svg2pdf(element, pdf, {
@@ -288,7 +288,7 @@ function makeEps(svg: string) {
     const lines: string[] = [
       "%!PS-Adobe-3.0 EPSF-3.0",
       "%%BoundingBox: 0 0 " + Math.ceil(size.width) + " " + Math.ceil(size.height),
-      "%%Creator: My Jersey Studio",
+      "%%Creator: JerseyOS",
       "%%Title: Editable Vector Artwork",
       "%%LanguageLevel: 2",
       "%%Pages: 1",

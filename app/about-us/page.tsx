@@ -57,7 +57,7 @@ export default function AboutUsPage() {
           <header className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-white/8 bg-[#04101f]/88 px-4 py-3 backdrop-blur-xl">
             <a href="/" className="flex items-center gap-3">
               <img
-                src="/brand/jerseyos-logo.svg"
+                src="/brand/jerseyos-logo.png"
                 alt="JerseyOS"
                 className="h-12 w-12 object-contain"
               />
@@ -278,7 +278,7 @@ function HeroStudioArtwork() {
       <div className="relative grid h-full items-center gap-4 sm:grid-cols-[1fr_1.1fr]">
         <div className="flex justify-center">
           <img
-            src="/brand/jerseyos-logo.svg"
+            src="/brand/jerseyos-logo.png"
             alt="JerseyOS"
             className="h-[265px] w-[265px] object-contain drop-shadow-[0_25px_35px_rgba(212,164,43,0.20)]"
           />

@@ -52,7 +52,7 @@ export default function ToolsPage() {
         </a>
 
         <p className="mt-9 text-sm font-semibold uppercase tracking-[0.24em] text-sky-400">
-          My Jersey Studio
+          JerseyOS
         </p>
         <h1 className="mt-2 text-4xl font-black tracking-tight sm:text-5xl">Tools</h1>
         <p className="mt-4 max-w-3xl text-white/55">

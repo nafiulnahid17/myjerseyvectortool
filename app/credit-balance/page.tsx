@@ -24,9 +24,12 @@ export default function CreditBalancePage() {
               Dashboard
             </a>
 
-            <div className="text-right">
-              <div className="text-lg font-black">My Jersey Studio</div>
-              <div className="text-xs text-white/45">Credit Balance</div>
+            <div className="flex items-center gap-3">
+              <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className="h-12 w-12 object-contain" />
+              <div className="text-right">
+                <div className="text-lg font-black">JerseyOS</div>
+                <div className="text-xs text-white/45">Credit Balance</div>
+              </div>
             </div>
           </header>
 

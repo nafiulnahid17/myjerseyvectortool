@@ -263,7 +263,7 @@ export function FileConverterPage() {
                     ↻
                   </span>
                   <div>
-                    <span className="block text-5xl font-bold tracking-tight text-white">File Converter</span>
+                    <span className="block text-5xl font-bold tracking-tight text-white">ConvertX</span>
                     <span className="mt-2 block text-lg text-white/75">Convert your jersey design files between different formats, quickly and easily.</span>
                   </div>
                 </div>

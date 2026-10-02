@@ -205,7 +205,7 @@ export function DashboardShell() {
                   <Menu className="h-6 w-6" />
                 </button>
                 <img
-                  src="/brand/jerseyos-logo.svg"
+                  src="/brand/jerseyos-logo.png"
                   alt="JerseyOS"
                   className="hidden h-11 w-11 shrink-0 object-contain sm:block"
                 />
@@ -319,7 +319,7 @@ export function DashboardShell() {
               <div className="relative z-10 max-w-[690px] p-7 sm:p-9 lg:p-11">
                 <div className="flex flex-wrap items-center gap-5">
                   <img
-                    src="/brand/jerseyos-logo.svg"
+                    src="/brand/jerseyos-logo.png"
                     alt="JerseyOS"
                     className="h-28 w-28 shrink-0 object-contain sm:h-32 sm:w-32"
                   />
@@ -458,7 +458,7 @@ function Brand({ dark }: { dark: boolean }) {
   return (
     <div className="flex items-center gap-3 px-2 py-2">
       <img
-        src="/brand/jerseyos-logo.svg"
+        src="/brand/jerseyos-logo.png"
         alt="JerseyOS"
         className="h-16 w-16 shrink-0 object-contain"
       />

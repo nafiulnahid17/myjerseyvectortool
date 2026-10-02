@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import Link from 'next/link';
 import {
   ArrowLeft,
   ArrowRight,
@@ -226,7 +227,7 @@ export function ImageToVectorStudio() {
 
     setError('');
     setResultMode(mode);
-    setStatusMessage(mode === 'edit' ? 'Applying your customizationâ€¦' : 'Preparing the production layoutâ€¦');
+    setStatusMessage(mode === 'edit' ? 'Applying your customization…' : 'Preparing the production layout…');
     setPhase('generating');
 
     const customizationPrompt = mode === 'edit' ? buildCustomizationPrompt(customize, customPrompt) : '';
@@ -302,9 +303,9 @@ export function ImageToVectorStudio() {
             <div className="flex items-center gap-3">
               <div className="hidden rounded-2xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/65 md:block">
                 {providerConfigured === null
-                  ? 'Checking AI engineâ€¦'
+                  ? 'Checking AI engine…'
                   : providerConfigured
-                    ? `OpenAI connected${providerModel ? ` Â· ${providerModel}` : ''}`
+                    ? `OpenAI connected${providerModel ? ` · ${providerModel}` : ''}`
                     : 'OpenAI image engine ready for API key'}
               </div>
               <button className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white/80">
@@ -473,7 +474,7 @@ function StudioSidebar() {
 
 function SideLink({ href, label, icon: Icon, active }: { href: string; label: string; icon: ComponentType<{ className?: string }>; active?: boolean }) {
   return (
-    <a
+    <Link
       href={href}
       className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-sm transition ${
         active
@@ -483,7 +484,7 @@ function SideLink({ href, label, icon: Icon, active }: { href: string; label: st
     >
       <span className="grid h-8 w-8 place-items-center rounded-xl bg-white/[0.04]"><Icon className="h-4 w-4" /></span>
       {label}
-    </a>
+    </Link>
   );
 }
 
@@ -545,7 +546,7 @@ function SetupPhase(props: {
                 <CloudUpload className="h-9 w-9" />
               </div>
               <h3 className="mt-5 text-2xl font-bold">Drag & drop your jersey image</h3>
-              <p className="mt-2 text-sm text-white/55">JPG, JPEG, PNG, WEBP, HEIC and other browser-supported image files Â· Max 25 MB</p>
+              <p className="mt-2 text-sm text-white/55">JPG, JPEG, PNG, WEBP, HEIC and other browser-supported image files · Max 25 MB</p>
             </div>
           )}
           <button onClick={props.onChooseFile} className="absolute bottom-5 left-1/2 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#0b7dff] px-5 py-3 text-sm font-semibold shadow-[0_14px_32px_rgba(11,125,255,.30)]">
@@ -669,7 +670,7 @@ function ResultPhase(props: {
         <div className="rounded-[26px] border border-white/10 bg-[#07111f] p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">Generation Summary</p>
           <div className="mt-4 space-y-3 text-sm">
-            <SummaryRow label="Pattern" value={props.pattern?.title || 'â€”'} />
+            <SummaryRow label="Pattern" value={props.pattern?.title || '—'} />
             <SummaryRow label="Quality" value={qualityLabel(props.quality)} />
             <SummaryRow label="Aspect" value={props.aspectRatio} />
             <SummaryRow label="Parts" value="8 separated components" />
@@ -833,7 +834,7 @@ function DownloadPhase(props: {
 
         <button onClick={props.onDownload} disabled={props.exporting || !props.outputUrl} className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 text-lg font-bold disabled:opacity-40">
           {props.exporting ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
-          {props.exporting ? 'Preparing Exportâ€¦' : 'Download'}
+          {props.exporting ? 'Preparing Export…' : 'Download'}
         </button>
         <button onClick={props.onBack} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 px-5 py-3 text-sm text-white/60"><ArrowLeft className="h-4 w-4" /> Back to Preview</button>
       </div>
@@ -1041,4 +1042,3 @@ async function exportArtwork(dataUrl: string, format: ExportFormat, quality: Exp
 
   downloadBlob(new Blob([await pdfBlob.arrayBuffer()], { type: 'application/pdf' }), `my-jersey-production-${stamp}.ai`);
 }
-

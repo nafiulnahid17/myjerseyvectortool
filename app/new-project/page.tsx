@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+﻿import { ImageToVectorStudio } from '@/components/image-vector/image-to-vector-studio';
 
 export default function NewProjectPage() {
-  redirect('/image-to-vector');
+  return <ImageToVectorStudio />;
 }

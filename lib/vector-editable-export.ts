@@ -44,6 +44,62 @@ export async function buildEditableVectorPackage(args: {
   return { svg: prepared.svg, ai, eps, pathCount: prepared.pathCount };
 }
 
+export async function editableSvgToPdfBlob(svg: string) {
+  return await makeAi(svg);
+}
+
+export async function editableSvgToAiBlob(svg: string) {
+  return await makeAi(svg);
+}
+
+export function editableSvgToEpsBlob(svg: string) {
+  return makeEps(svg);
+}
+
+export async function editableSvgToRasterBlob(
+  svg: string,
+  format: 'png' | 'jpeg',
+  maxEdge = 3000,
+) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svg, 'image/svg+xml');
+  const root = doc.documentElement as unknown as SVGSVGElement;
+  const size = bounds(root);
+  const ratio = Math.min(1, maxEdge / Math.max(size.width, size.height));
+  const width = Math.max(1, Math.round(size.width * ratio));
+  const height = Math.max(1, Math.round(size.height * ratio));
+
+  const source = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+  const url = URL.createObjectURL(source);
+
+  try {
+    const image = await loadImage(url);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Raster export canvas is unavailable.');
+
+    if (format === 'jpeg') {
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    ctx.drawImage(image, 0, 0, width, height);
+
+    return await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => blob ? resolve(blob) : reject(new Error('Could not create raster export.')),
+        format === 'png' ? 'image/png' : 'image/jpeg',
+        format === 'jpeg' ? 0.95 : undefined,
+      );
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function paint() {
   return new Promise<void>((resolve) => {
     requestAnimationFrame(() => requestAnimationFrame(() => resolve()));

@@ -25,7 +25,7 @@ export default function CreditBalancePage() {
             </a>
 
             <div className="flex items-center gap-3">
-              <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className="h-12 w-12 object-contain" />
+              <img src="/brand/jerseyos-logo.png" alt="JerseyOS" className="h-12 w-12 object-contain" />
               <div className="text-right">
                 <div className="text-lg font-black">JerseyOS</div>
                 <div className="text-xs text-white/45">Credit Balance</div>

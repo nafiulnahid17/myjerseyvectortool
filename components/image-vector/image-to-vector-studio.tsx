@@ -37,6 +37,13 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { runImageWorkflow } from '@/lib/ai/imagegpt-browser';
+import { VectorCustomizeEditor } from '@/components/image-vector/vector-customize-editor';
+import {
+  editableSvgToAiBlob,
+  editableSvgToEpsBlob,
+  editableSvgToPdfBlob,
+  editableSvgToRasterBlob,
+} from '@/lib/vector-editable-export';
 import type {
   AspectRatioId,
   ExportQuality,
@@ -78,7 +85,7 @@ const steps = [
   { key: 'result', number: 2, label: 'Generate' },
   { key: 'customize', number: 3, label: 'Customize' },
   { key: 'preview', number: 4, label: 'Preview' },
-  { key: 'download', number: 5, label: 'Editable Vector' },
+  { key: 'download', number: 5, label: 'Download' },
 ] as const;
 
 const phaseRank: Record<StudioPhase, number> = {
@@ -154,11 +161,17 @@ export function ImageToVectorStudio() {
   const [customPrompt, setCustomPrompt] = useState('');
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewMode, setPreviewMode] = useState<'2d' | '3d'>('2d');
+  const [editorSvg, setEditorSvg] = useState('');
   const [vectorState, setVectorState] = useState<'idle' | 'building' | 'ready'>('idle');
   const [vectorProgress, setVectorProgress] = useState(0);
   const [vectorStatus, setVectorStatus] = useState('');
+  const [downloadFormat, setDownloadFormat] = useState<'svg' | 'png' | 'jpeg' | 'pdf' | 'ai' | 'eps'>('svg');
   const [editableSvg, setEditableSvg] = useState('');
   const [editableAiBlob, setEditableAiBlob] = useState<Blob | null>(null);
+  const [editablePdfBlob, setEditablePdfBlob] = useState<Blob | null>(null);
+  const [editableEpsBlob, setEditableEpsBlob] = useState<Blob | null>(null);
+  const [editablePngBlob, setEditablePngBlob] = useState<Blob | null>(null);
+  const [editableJpegBlob, setEditableJpegBlob] = useState<Blob | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -191,11 +204,16 @@ export function ImageToVectorStudio() {
     setSourceFile(file);
     setSourceUrl(URL.createObjectURL(file));
     setGeneratedUrl('');
+    setEditorSvg('');
     setVectorState('idle');
     setVectorProgress(0);
     setVectorStatus('');
     setEditableSvg('');
     setEditableAiBlob(null);
+    setEditablePdfBlob(null);
+    setEditableEpsBlob(null);
+    setEditablePngBlob(null);
+    setEditableJpegBlob(null);
     setError('');
     setStatusMessage('');
   }
@@ -347,48 +365,79 @@ export function ImageToVectorStudio() {
 
 async function buildEditableVectorFiles() {
     if (!visibleOutput) {
-      setError('Generate and preview an output before creating editable vector files.');
+      setError('Generate and preview an output before creating download files.');
       return;
     }
 
     setPhase('download');
     setVectorState('building');
-    setVectorProgress(8);
-    setVectorStatus('Preparing the final production artwork…');
+    setVectorProgress(6);
+    setVectorStatus('Preparing the final edited artwork…');
     setEditableSvg('');
     setEditableAiBlob(null);
+    setEditablePdfBlob(null);
+    setEditableEpsBlob(null);
+    setEditablePngBlob(null);
+    setEditableJpegBlob(null);
     setError('');
 
     try {
       await nextPaint();
 
-      setVectorProgress(22);
-      setVectorStatus('Tracing artwork into editable vector paths…');
-      const tracedSvg = await traceSvg(
-        visibleOutput,
-        '4k',
-        selectedPattern?.background === 'transparent',
-      );
+      let finalSvg = editorSvg.trim();
+
+      if (!finalSvg) {
+        setVectorProgress(20);
+        setVectorStatus('Tracing artwork into editable vector paths…');
+
+        const tracedSvg = await traceSvg(
+          visibleOutput,
+          '4k',
+          selectedPattern?.background === 'transparent',
+        );
+
+        await nextPaint();
+        setVectorProgress(38);
+        setVectorStatus('Separating paths into the 8 editable jersey component groups…');
+        finalSvg = await groupEditableSvg(tracedSvg);
+      } else {
+        setVectorProgress(38);
+        setVectorStatus('Using the customized editable vector canvas…');
+      }
+
+      finalSvg = addEditableMetadata(finalSvg);
 
       await nextPaint();
-      setVectorProgress(58);
-      setVectorStatus('Separating paths into the 8 editable jersey component groups…');
-      const layeredSvg = await groupEditableSvg(tracedSvg);
+      setVectorProgress(54);
+      setVectorStatus('Building editable SVG and vector PDF…');
+
+      const [pdfBlob, aiBlob] = await Promise.all([
+        editableSvgToPdfBlob(finalSvg),
+        editableSvgToAiBlob(finalSvg),
+      ]);
 
       await nextPaint();
-      setVectorProgress(78);
-      setVectorStatus('Preparing editable typography outlines and Illustrator layers…');
-      const finalSvg = addEditableMetadata(layeredSvg);
+      setVectorProgress(72);
+      setVectorStatus('Building editable EPS artwork…');
+      const epsBlob = editableSvgToEpsBlob(finalSvg);
 
       await nextPaint();
-      setVectorProgress(90);
-      setVectorStatus('Building the Illustrator-compatible editable AI file…');
-      const aiBlob = await vectorPdfBlob(finalSvg);
+      setVectorProgress(86);
+      setVectorStatus('Rendering PNG and JPEG previews from the edited vector…');
+
+      const [pngBlob, jpegBlob] = await Promise.all([
+        editableSvgToRasterBlob(finalSvg, 'png', 3200),
+        editableSvgToRasterBlob(finalSvg, 'jpeg', 3200),
+      ]);
 
       setEditableSvg(finalSvg);
+      setEditablePdfBlob(pdfBlob);
       setEditableAiBlob(aiBlob);
+      setEditableEpsBlob(epsBlob);
+      setEditablePngBlob(pngBlob);
+      setEditableJpegBlob(jpegBlob);
       setVectorProgress(100);
-      setVectorStatus('Editable vector files are ready.');
+      setVectorStatus('All download formats are ready.');
       setVectorState('ready');
     } catch (vectorError) {
       setVectorState('idle');
@@ -397,27 +446,45 @@ async function buildEditableVectorFiles() {
       setError(
         vectorError instanceof Error
           ? vectorError.message
-          : 'Could not create editable vector files.',
+          : 'Could not create download files.',
       );
     }
   }
 
-  function downloadEditableSvg() {
-    if (!editableSvg) return;
+  function downloadPreparedFile() {
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    downloadBlob(
-      new Blob([editableSvg], { type: 'image/svg+xml;charset=utf-8' }),
-      `my-jersey-editable-vector-${stamp}.svg`,
-    );
-  }
 
-  function downloadEditableAi() {
-    if (!editableAiBlob) return;
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    downloadBlob(
-      new Blob([editableAiBlob], { type: 'application/pdf' }),
-      `my-jersey-editable-${stamp}.ai`,
-    );
+    if (downloadFormat === 'svg' && editableSvg) {
+      downloadBlob(
+        new Blob([editableSvg], { type: 'image/svg+xml;charset=utf-8' }),
+        'my-jersey-editable-' + stamp + '.svg',
+      );
+      return;
+    }
+
+    if (downloadFormat === 'png' && editablePngBlob) {
+      downloadBlob(editablePngBlob, 'my-jersey-' + stamp + '.png');
+      return;
+    }
+
+    if (downloadFormat === 'jpeg' && editableJpegBlob) {
+      downloadBlob(editableJpegBlob, 'my-jersey-' + stamp + '.jpg');
+      return;
+    }
+
+    if (downloadFormat === 'pdf' && editablePdfBlob) {
+      downloadBlob(editablePdfBlob, 'my-jersey-editable-' + stamp + '.pdf');
+      return;
+    }
+
+    if (downloadFormat === 'ai' && editableAiBlob) {
+      downloadBlob(editableAiBlob, 'my-jersey-editable-' + stamp + '.ai');
+      return;
+    }
+
+    if (downloadFormat === 'eps' && editableEpsBlob) {
+      downloadBlob(editableEpsBlob, 'my-jersey-editable-' + stamp + '.eps');
+    }
   }
 
   const currentStep = phaseRank[phase];
@@ -496,22 +563,27 @@ async function buildEditableVectorFiles() {
               />
             ) : null}
 
-            {phase === 'customize' ? (
-              <CustomizePhase
-                outputUrl={visibleOutput}
-                values={customize}
-                prompt={customPrompt}
-                logoFile={logoFile}
-                onValue={(key, value) => setCustomize((prev) => ({ ...prev, [key]: value }))}
-                onPrompt={setCustomPrompt}
-                onLogo={() => logoRef.current?.click()}
-                onReset={() => {
-                  setCustomize(emptyCustomize);
-                  setCustomPrompt('');
-                  setLogoFile(null);
+            {phase === 'customize' && pattern ? (
+              <VectorCustomizeEditor
+                sourceUrl={visibleOutput}
+                initialSvg={editorSvg}
+                pattern={pattern}
+                quality={quality}
+                aspectRatio={aspectRatio}
+                onComplete={({ svg, previewDataUrl }) => {
+                  setEditorSvg(svg);
+                  setGeneratedUrl(previewDataUrl);
+                  setVectorState('idle');
+                  setVectorProgress(0);
+                  setVectorStatus('');
+                  setEditableSvg('');
+                  setEditableAiBlob(null);
+                  setEditablePdfBlob(null);
+                  setEditableEpsBlob(null);
+                  setEditablePngBlob(null);
+                  setEditableJpegBlob(null);
+                  setPhase('preview');
                 }}
-                onRegenerate={() => void generate('edit')}
-                onNext={() => setPhase('preview')}
               />
             ) : null}
 
@@ -531,9 +603,10 @@ async function buildEditableVectorFiles() {
                 progress={vectorProgress}
                 status={vectorStatus}
                 previewOnly={isPreviewOnly}
+                format={downloadFormat}
+                onFormat={setDownloadFormat}
                 onBack={() => setPhase('preview')}
-                onDownloadSvg={downloadEditableSvg}
-                onDownloadAi={downloadEditableAi}
+                onDownload={downloadPreparedFile}
               />
             ) : null}
           </div>
@@ -931,7 +1004,7 @@ function PreviewPhase(props: {
           className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-6 py-4 text-lg font-black shadow-[0_16px_36px_rgba(8,117,255,.26)] transition disabled:cursor-not-allowed disabled:opacity-35"
         >
           <Download className="h-5 w-5" />
-          Download Editable SVG File
+          Continue to Download
           <ArrowRight className="h-5 w-5" />
         </button>
       </Panel>

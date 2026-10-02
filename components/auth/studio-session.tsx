@@ -161,10 +161,21 @@ export function StudioSessionProvider({ children }: { children: ReactNode }) {
       {children}
 
       {checking && protectedRoute ? (
-        <div className="fixed inset-0 z-[100] grid place-items-center bg-[#020812]/95 text-white backdrop-blur-md">
-          <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4">
-            <LoaderCircle className="h-5 w-5 animate-spin text-sky-400" />
-            Checking studio session…
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-[#020812]/95 p-6 text-white backdrop-blur-md">
+          <div className="text-center">
+            <img
+              src="/brand/jerseyos-logo.svg"
+              alt="JerseyOS"
+              className="mx-auto h-36 w-36 object-contain sm:h-44 sm:w-44"
+            />
+            <p className="mt-4 text-xl font-black">JerseyOS</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-amber-200/70">
+              AI-Powered Full Operating System for Jersey Production
+            </p>
+            <div className="mx-auto mt-5 flex w-fit items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-3">
+              <LoaderCircle className="h-5 w-5 animate-spin text-amber-300" />
+              Checking JerseyOS session…
+            </div>
           </div>
         </div>
       ) : null}
@@ -221,12 +232,16 @@ function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: ()
           <X className="h-5 w-5" />
         </button>
         <div className="relative">
-          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[linear-gradient(135deg,#0875ff,#22b0ff)] shadow-[0_12px_30px_rgba(8,117,255,.3)]">
-            <LockKeyhole className="h-7 w-7" />
-          </div>
-          <p className="mt-5 text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">My Jersey Studio</p>
+          <img
+            src="/brand/jerseyos-logo.svg"
+            alt="JerseyOS"
+            className="h-28 w-28 object-contain"
+          />
+          <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-amber-300">JerseyOS</p>
           <h2 className="mt-2 text-3xl font-black">Sign in to continue</h2>
-          <p className="mt-2 text-sm leading-6 text-white/55">Studio tools are protected. Sign in before opening a feature.</p>
+          <p className="mt-2 text-sm font-medium leading-6 text-white/70">AI-Powered Full Operating System for Jersey Production</p>
+          <p className="mt-1 text-xs text-white/40">Owned by My Jersey</p>
+          <p className="mt-3 text-sm leading-6 text-white/55">JerseyOS tools are protected. Sign in before opening a feature.</p>
 
           <form onSubmit={submit} className="mt-6 space-y-3">
             <label className="block">
@@ -315,9 +330,11 @@ function ProfileModal({
         </button>
 
         <div className="flex items-start gap-4">
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-[linear-gradient(135deg,#0875ff,#22b0ff)]">
-            <UserRound className="h-7 w-7" />
-          </div>
+          <img
+            src="/brand/jerseyos-logo.svg"
+            alt="JerseyOS"
+            className="h-16 w-16 shrink-0 object-contain"
+          />
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">First-time setup</p>
             <h2 className="mt-1 text-3xl font-black">Complete your profile</h2>

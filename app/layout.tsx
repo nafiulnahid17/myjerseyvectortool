@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { StudioSessionProvider } from "@/components/auth/studio-session";
+import { GlobalJerseyOSNavigation } from "@/components/navigation/global-jerseyos-navigation";
 
 export const metadata: Metadata = {
   title: "JerseyOS | AI-Powered Jersey Production OS",
@@ -22,7 +23,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <StudioSessionProvider>{children}</StudioSessionProvider>
+        <StudioSessionProvider>
+          <GlobalJerseyOSNavigation />
+          {children}
+        </StudioSessionProvider>
       </body>
     </html>
   );

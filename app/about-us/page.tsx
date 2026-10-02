@@ -20,14 +20,14 @@ import {
 } from 'lucide-react';
 
 const tools = [
-  { title: 'Image to Vector', text: 'Convert jersey images into clean, editable vector-oriented production layouts.', icon: ImageIcon, href: '/image-to-vector' },
-  { title: 'One-click Creation', text: 'Generate a complete jersey production layout from a single source image.', icon: Sparkles, href: '/oneclick-creation' },
-  { title: 'File Converter', text: 'Convert supported design files between common production and preview formats.', icon: FileCog, href: '/file-converter' },
-  { title: 'Edit Existing File', text: 'Modify and customize an existing jersey design inside the production workflow.', icon: Palette, href: '/edit-existing-file' },
-  { title: 'Fallback Backup', text: 'Keep recovery-ready project files available for safer production work.', icon: Cloud, href: '/backup' },
-  { title: 'Mockup Generator', text: 'Create jersey presentation previews and mockup views for review.', icon: PackageOpen, href: '/mockup-generator' },
-  { title: 'AI Assistant', text: 'Use AI-assisted commands for design suggestions and production changes.', icon: Bot, href: '/ai-assistant' },
-];
+  { title: 'VectorForge', text: 'Convert jersey images into clean, editable vector-oriented production layouts.', icon: ImageIcon, href: '/image-to-vector' },
+  { title: 'AutoPilot', text: 'Generate a complete jersey production layout from a single source image.', icon: Sparkles, href: '/oneclick-creation' },
+  { title: 'ConvertX', text: 'Convert supported design files between common production and preview formats.', icon: FileCog, href: '/file-converter' },
+  { title: 'VectorLab', text: 'Modify and customize an existing jersey design inside the production workflow.', icon: Palette, href: '/edit-existing-file' },
+  { title: 'RescueX', text: 'Keep recovery-ready project files available for safer production work.', icon: Cloud, href: '/backup' },
+  { title: 'Showcase AI', text: 'Create jersey presentation previews and mockup views for review.', icon: PackageOpen, href: '/mockup-generator' },
+  { title: 'FrontScan', text: 'Use OCR-powered analysis for jersey typography and front artwork details.', icon: ScanSearch, href: '/frontscan' },
+]
 
 const pipeline = [
   { number: '1', title: 'Upload Input', text: 'Upload a jersey image or reference design.', icon: ImageIcon },
@@ -56,10 +56,15 @@ export default function AboutUsPage() {
         <div className="relative mx-auto max-w-[1600px] px-4 pb-8 pt-4 sm:px-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-4 rounded-[22px] border border-white/8 bg-[#04101f]/88 px-4 py-3 backdrop-blur-xl">
             <a href="/" className="flex items-center gap-3">
-              <div className="grid h-11 w-11 place-items-center rounded-xl border border-sky-400/30 bg-[linear-gradient(135deg,#083b76,#0ea5ff)] text-xl font-black">
-                MJ
+              <img
+                src="/brand/jerseyos-logo.svg"
+                alt="JerseyOS"
+                className="h-12 w-12 object-contain"
+              />
+              <div>
+                <div className="text-lg font-black tracking-tight">JerseyOS</div>
+                <div className="text-[9px] font-semibold uppercase tracking-[0.08em] text-amber-200/65">AI-Powered Jersey Production OS</div>
               </div>
-              <div className="text-lg font-black tracking-tight">My Jersey <span className="text-sky-400">Studio</span></div>
             </a>
 
             <nav className="hidden items-center gap-7 text-sm text-white/70 lg:flex">
@@ -87,12 +92,12 @@ export default function AboutUsPage() {
                 <p className="text-xs font-black uppercase tracking-[0.26em] text-cyan-300">âœ¦ About Us</p>
                 <h1 className="mt-3 text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
                   About
-                  <span className="block">My Jersey <span className="text-cyan-400">Studio</span></span>
+                  <span className="block text-amber-200">JerseyOS</span>
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
-                  My Jersey Studio is a production-focused jersey design workspace that transforms jersey images into
-                  production-oriented layouts. It brings upload, AI-assisted reconstruction, customization, preview and
-                  export workflows into one interface for faster design and production review.
+                  JerseyOS is an AI-powered full operating system for jersey production. It brings upload, AI-assisted
+                  reconstruction, customization, preview, export, and production workflows into one interface for faster
+                  design and production review.
                 </p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
@@ -122,7 +127,7 @@ export default function AboutUsPage() {
                   <span className="grid h-7 w-7 place-items-center rounded-full bg-cyan-400 text-xs font-black text-[#02101c]">âœ“</span>
                 </div>
                 <p className="mt-4 text-sm leading-7 text-white/68">
-                  Creator and lead developer of My Jersey Studio, focused on product design, full-stack implementation,
+                  Creator and lead developer of JerseyOS, focused on product design, full-stack implementation,
                   AI-assisted design systems and production workflow development.
                 </p>
 
@@ -222,7 +227,7 @@ export default function AboutUsPage() {
                 <ShieldAlert className="mt-1 h-7 w-7 shrink-0 text-amber-300" />
                 <div>
                   <h3 className="font-black text-amber-100">Important Notice & License Information</h3>
-                  <p className="mt-1 text-xs leading-5 text-amber-100/65">Please review the following information carefully before using My Jersey Studio.</p>
+                  <p className="mt-1 text-xs leading-5 text-amber-100/65">Please review the following information carefully before using JerseyOS.</p>
                 </div>
               </div>
 
@@ -234,7 +239,11 @@ export default function AboutUsPage() {
           </section>
 
           <footer className="mt-5 flex flex-col gap-3 border-t border-white/8 py-5 text-xs text-white/40 sm:flex-row sm:items-center sm:justify-between">
-            <span>My Jersey Studio â€¢ Production Workspace</span>
+            <div>
+              <span className="font-semibold text-white/55">JerseyOS</span>
+              <span> · AI-Powered Full Operating System for Jersey Production · Owned by My Jersey</span>
+              <div className="mt-1">Copyright 2027- 2028 @ My Jersey</div>
+            </div>
             <a href="https://www.facebook.com/share/1H4UxPjq4q/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sky-400">
               Developer Facebook <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -264,38 +273,30 @@ function Notice({ text }: { text: string }) {
 
 function HeroStudioArtwork() {
   return (
-    <div className="relative min-h-[300px] overflow-hidden rounded-[24px] border border-sky-400/15 bg-[radial-gradient(circle_at_center,rgba(0,183,255,0.18),transparent_34%),linear-gradient(135deg,#07182d,#04101f)] p-5">
-      <div className="absolute -right-10 top-4 h-56 w-56 rounded-full bg-cyan-400/10 blur-3xl" />
-      <div className="relative grid h-full grid-cols-[0.9fr_1.1fr] items-center gap-4">
+    <div className="relative min-h-[300px] overflow-hidden rounded-[24px] border border-sky-400/15 bg-[radial-gradient(circle_at_center,rgba(212,164,43,0.16),transparent_34%),linear-gradient(135deg,#07182d,#04101f)] p-5">
+      <div className="absolute -right-10 top-4 h-56 w-56 rounded-full bg-amber-300/10 blur-3xl" />
+      <div className="relative grid h-full items-center gap-4 sm:grid-cols-[1fr_1.1fr]">
         <div className="flex justify-center">
-          <svg viewBox="0 0 250 310" className="h-[260px] w-[220px] drop-shadow-[0_25px_35px_rgba(0,153,255,0.30)]" fill="none">
-            <path d="M72 28L52 49L28 59V288H222V59L198 49L178 28H72Z" fill="#071c34" stroke="#0ea5ff" strokeWidth="4"/>
-            <path d="M72 28L92 52H158L178 28" fill="#03101f" stroke="#0ea5ff" strokeWidth="4"/>
-            <path d="M61 72L98 116L112 72L127 115L143 72L191 128" stroke="#0b8cff" strokeWidth="8" opacity=".7"/>
-            <path d="M46 148L88 108L113 155L144 111L204 171" stroke="#22d3ee" strokeWidth="5" opacity=".7"/>
-            <path d="M50 229L96 181L125 226L152 180L201 234" stroke="#0ea5ff" strokeWidth="5" opacity=".65"/>
-            <text x="125" y="168" textAnchor="middle" fill="white" fontSize="36" fontWeight="800">MJ</text>
-            <text x="125" y="196" textAnchor="middle" fill="#7dd3fc" fontSize="12" fontWeight="700">MY JERSEY</text>
-            <text x="125" y="214" textAnchor="middle" fill="white" fontSize="11" fontWeight="700">STUDIO</text>
-          </svg>
+          <img
+            src="/brand/jerseyos-logo.svg"
+            alt="JerseyOS"
+            className="h-[265px] w-[265px] object-contain drop-shadow-[0_25px_35px_rgba(212,164,43,0.20)]"
+          />
         </div>
 
-        <div className="grid gap-3">
-          <div className="rounded-2xl border border-sky-400/20 bg-white/[0.03] p-3">
-            <svg viewBox="0 0 220 130" className="h-[120px] w-full">
-              <rect x="10" y="10" width="200" height="110" rx="16" fill="#061323" stroke="#0ea5ff" strokeOpacity=".4"/>
-              <path d="M65 28L52 41L38 46V105H102V46L88 41L75 28H65Z" fill="#0c2748" stroke="#4ac9ff" strokeWidth="2"/>
-              <path d="M142 28L129 41L115 46V105H179V46L165 41L152 28H142Z" fill="#08182c" stroke="#755dff" strokeWidth="2"/>
-              <path d="M49 70H91M126 70H168" stroke="#22d3ee" strokeWidth="3"/>
-            </svg>
+        <div className="space-y-3">
+          <div className="rounded-2xl border border-amber-300/20 bg-white/[0.03] p-5">
+            <p className="text-3xl font-black text-white">JerseyOS</p>
+            <p className="mt-2 text-sm font-semibold leading-6 text-amber-100/80">
+              AI-Powered Full Operating System for Jersey Production
+            </p>
+            <p className="mt-2 text-xs text-white/45">Owned by My Jersey</p>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {['#0ea5ff','#2563eb','#64748b','#020617'].map((color) => <div key={color} className="h-12 rounded-xl border border-white/10" style={{ backgroundColor: color }} />)}
+          <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/8 px-3 py-2 text-center text-xs font-bold text-cyan-200">
+            Image → Vector • Customize • Production Ready
           </div>
-          <div className="rounded-xl border border-cyan-400/20 bg-cyan-400/8 px-3 py-2 text-center text-xs font-bold text-cyan-200">Image â†’ Vector â€¢ Production Ready</div>
         </div>
       </div>
     </div>
   );
 }
-

@@ -11,7 +11,7 @@ export function FeatureStatusPage({
   title,
   description,
   primaryHref = '/image-to-vector',
-  primaryLabel = 'Open Image to Vector',
+  primaryLabel = 'Open VectorForge',
 }: Props) {
   return (
     <main className="min-h-screen bg-[#020812] px-5 py-8 text-white sm:px-8">
@@ -29,7 +29,13 @@ export function FeatureStatusPage({
           <div className="grid h-16 w-16 place-items-center rounded-2xl border border-sky-400/20 bg-sky-500/10 text-sky-300">
             <Construction className="h-8 w-8" />
           </div>
-          <p className="mt-7 text-sm font-semibold uppercase tracking-[0.24em] text-sky-400">My Jersey Studio</p>
+          <div className="mt-7 flex items-center gap-3">
+            <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className="h-14 w-14 object-contain" />
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-300">JerseyOS</p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/38">AI-Powered Jersey Production OS</p>
+            </div>
+          </div>
           <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">{title}</h1>
           <p className="mt-5 max-w-2xl text-base leading-8 text-white/60">{description}</p>
 
@@ -52,6 +58,7 @@ export function FeatureStatusPage({
             </a>
           </div>
         </section>
+        <footer className="mt-6 text-center text-xs text-white/30">Copyright 2027- 2028 @ My Jersey</footer>
       </div>
     </main>
   );

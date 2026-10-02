@@ -499,7 +499,8 @@ function HamburgerMenu({
                 ['My Library', '/projects', ImageIcon],
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],
-                ['Credit Balance', '/topup-ai-credits', Coins],
+                ['Credit Balance', '/credit-balance', Coins],
+                ['Topup AI Credits', '/topup-ai-credits', Plus],
                 ['Help & Support', '/help-support', CircleHelp],
                 ['About Us', '/about-us', Info],
               ].map(([label, href, Icon]) => {

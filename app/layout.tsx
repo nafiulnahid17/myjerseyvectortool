@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   description: "AI-Powered Full Operating System for Jersey Production",
   applicationName: "JerseyOS",
   icons: {
-    icon: "/brand/jerseyos-logo.svg",
-    shortcut: "/brand/jerseyos-logo.svg",
-    apple: "/brand/jerseyos-logo.svg",
+    icon: "/brand/jerseyos-logo.png",
+    shortcut: "/brand/jerseyos-logo.png",
+    apple: "/brand/jerseyos-logo.png",
   },
   manifest: "/manifest.webmanifest",
 };

@@ -11,7 +11,6 @@ import {
   Download,
   FileCog,
   FileImage,
-  FolderOpen,
   Globe,
   Home,
   Image as ImageIcon,
@@ -23,6 +22,7 @@ import {
   Pencil,
   Plus,
   RefreshCcw,
+  Search,
   RotateCcw,
   Settings,
   ShieldCheck,
@@ -502,7 +502,7 @@ async function buildEditableVectorFiles() {
               </button>
               <div>
                 <p className="text-sm font-medium text-sky-400">My Jersey Studio</p>
-                <h1 className="truncate text-lg font-bold sm:text-xl">Image to Vector</h1>
+                <h1 className="truncate text-lg font-bold sm:text-xl">VectorForge</h1>
               </div>
             </div>
 
@@ -632,27 +632,41 @@ async function buildEditableVectorFiles() {
 }
 
 function StudioSidebar() {
-  const first = [
-    { href: '/', label: 'Dashboard', icon: Home },
-    { href: '/new-project', label: 'New Project', icon: Plus },
-    { href: '/image-to-vector', label: 'Image To Vector', icon: ImageIcon, active: true },
-    { href: '/oneclick-creation', label: 'Oneclick Creation', icon: WandSparkles },
-    { href: '/file-converter', label: 'File Converter', icon: FileCog },
-    { href: '/edit-existing-file', label: 'Edit Existing File', icon: SquarePen },
-    { href: '/backup', label: 'Fallback Backup', icon: ShieldCheck },
-  ];
-  const second = [
-    { href: '/projects', label: 'My Projects', icon: FolderOpen },
-    { href: '/templates', label: 'Templates', icon: FileImage },
-    { href: '/design-elements', label: 'Design Elements', icon: Layers3 },
-    { href: '/mockup-generator', label: 'Mockup Generator', icon: PackageOpen },
-    { href: '/ai-assistant', label: 'AI Assistant', icon: Bot },
-    { href: '/settings', label: 'Settings', icon: Settings },
-    { href: '/help-support', label: 'Help & Support', icon: CircleHelp },
+  const groups = [
+    {
+      title: 'AI Powered Tools',
+      items: [
+        { href: '/image-to-vector', label: 'VectorForge', icon: ImageIcon, active: true },
+        { href: '/oneclick-creation', label: 'AutoPilot', icon: WandSparkles },
+        { href: '/edit-existing-file', label: 'VectorLab', icon: SquarePen },
+        { href: '/mockup-generator', label: 'Showcase AI', icon: PackageOpen },
+        { href: '/frontscan', label: 'FrontScan', icon: Search },
+        { href: '/batchforge', label: 'BatchForge', icon: Layers3 },
+        { href: '/ordersheet', label: 'OrderSheet', icon: FileCog },
+      ],
+    },
+    {
+      title: 'Elements Tools',
+      items: [
+        { href: '/design-elements', label: 'AssetForge', icon: Layers3 },
+        { href: '/templates', label: 'DesignVault', icon: FileImage },
+        { href: '/file-converter', label: 'ConvertX', icon: FileCog },
+        { href: '/exportpack', label: 'ExportPack', icon: PackageOpen },
+      ],
+    },
+    {
+      title: 'Emergency Tools',
+      items: [
+        { href: '/backup', label: 'RescueX', icon: ShieldCheck },
+        { href: '/manual-vector-tracing', label: 'TraceDesk', icon: SquarePen },
+        { href: '/colour-editor', label: 'ColorDesk', icon: Layers3 },
+        { href: '/manual-production-cut-setup', label: 'CutPrep', icon: FileImage },
+      ],
+    },
   ];
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[245px] shrink-0 border-r border-white/10 bg-[linear-gradient(180deg,#06101d,#020711)] p-4 xl:block">
+    <aside className="sticky top-0 hidden h-screen w-[245px] shrink-0 overflow-y-auto border-r border-white/10 bg-[linear-gradient(180deg,#06101d,#020711)] p-4 xl:block">
       <div className="px-2 pb-5 pt-2">
         <div className="flex items-center gap-3">
           <div className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-[linear-gradient(135deg,#f8fbff,#d8edff)] text-xl font-black text-[#07101f]">
@@ -666,16 +680,32 @@ function StudioSidebar() {
       </div>
 
       <nav className="space-y-1.5">
-        {first.map((item) => <SideLink key={item.label} {...item} />)}
-      </nav>
-      <div className="my-5 h-px bg-white/10" />
-      <nav className="space-y-1.5">
-        {second.map((item) => <SideLink key={item.label} {...item} />)}
+        <SideLink href="/" label="Dashboard" icon={Home} />
+        <SideLink href="/new-project" label="New Project" icon={Plus} />
       </nav>
 
-      <div className="absolute bottom-4 left-4 right-4 rounded-[22px] border border-amber-400/30 bg-[linear-gradient(180deg,rgba(104,66,4,.34),rgba(58,38,3,.20))] p-4">
-        <p className="text-sm font-bold text-amber-200">Production workspace</p>
-        <p className="mt-1 text-xs leading-5 text-white/60">Higher export quality and batch tools can be connected to your plan system later.</p>
+      <div className="my-5 h-px bg-white/10" />
+
+      <div className="space-y-5 pb-6">
+        {groups.map((group) => (
+          <section key={group.title}>
+            <p className="mb-2 px-3 text-[10px] font-black uppercase tracking-[0.18em] text-sky-400">
+              {group.title}
+            </p>
+            <nav className="space-y-1.5">
+              {group.items.map((item) => (
+                <SideLink key={item.label} {...item} />
+              ))}
+            </nav>
+          </section>
+        ))}
+
+        <div className="h-px bg-white/10" />
+
+        <nav className="space-y-1.5">
+          <SideLink href="/settings" label="Settings" icon={Settings} />
+          <SideLink href="/help-support" label="Help & Support" icon={CircleHelp} />
+        </nav>
       </div>
     </aside>
   );

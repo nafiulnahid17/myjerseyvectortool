@@ -34,56 +34,69 @@ import {
 } from 'lucide-react';
 import { useStudioSession } from '@/components/auth/studio-session';
 
+type ToolCategory = 'AI Powered Tools' | 'Elements Tools' | 'Emergency Tools';
+
 type Tool = {
   title: string;
   href: string;
   image: string;
   keywords: string;
   icon: ComponentType<{ className?: string }>;
+  category: ToolCategory;
 };
 
-const tools: Tool[] = [
-  { title: 'Image to Vector', href: '/image-to-vector', image: '/dashboard/tools/image-to-vector.png', keywords: 'vector image jersey production', icon: ImageIcon },
-  { title: 'Oneclick Creation', href: '/oneclick-creation', image: '/dashboard/tools/oneclick-creation.png', keywords: 'automatic one click layout', icon: Sparkles },
-  { title: 'File Converter', href: '/file-converter', image: '/dashboard/tools/file-converter.png', keywords: 'svg png pdf ai eps jpg convert', icon: FileCog },
-  { title: 'Edit Existing File', href: '/edit-existing-file', image: '/dashboard/tools/edit-existing-file.png', keywords: 'edit modify customize', icon: SquarePen },
-  { title: 'Fallback Backup', href: '/backup', image: '/dashboard/tools/fallback-backup.png', keywords: 'backup restore cloud recover', icon: ShieldCheck },
-  { title: 'Mockup Generator', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: '2d 3d mockup preview', icon: PackageOpen },
-  { title: 'Templates', href: '/templates', image: '/dashboard/tools/templates.png', keywords: 'ready made jersey templates', icon: FileImage },
-  { title: 'Design Elements', href: '/design-elements', image: '/dashboard/tools/design-elements.png', keywords: 'logos fonts shapes patterns', icon: Layers3 },
-  { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.svg', keywords: 'front scan ocr typography font analysis artwork', icon: Search },
-  { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.svg', keywords: 'batch bulk production names numbers quantity list', icon: Layers3 },
-  { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.svg', keywords: 'export package svg ai eps pdf png production files', icon: PackageOpen },
-  { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.svg', keywords: 'order sheet production list quantity sizes names', icon: FileCog },
-  { title: 'Manual Vector Tracing', href: '/manual-vector-tracing', image: '/dashboard/tools/manual-vector-tracing.svg', keywords: 'manual vector trace pen bezier paths nodes artwork', icon: SquarePen },
-  { title: 'Colour Editor', href: '/colour-editor', image: '/dashboard/tools/colour-editor.svg', keywords: 'colour color palette recolor fill stroke jersey', icon: Layers3 },
-  { title: 'Manual Production / Cut Setup', href: '/manual-production-cut-setup', image: '/dashboard/tools/manual-production-cut-setup.svg', keywords: 'manual production cut setup panels sublimation cut lines layout', icon: FileImage },
+const categoryOrder: ToolCategory[] = [
+  'AI Powered Tools',
+  'Elements Tools',
+  'Emergency Tools',
 ];
+
+const tools: Tool[] = [
+  { title: 'VectorForge', href: '/image-to-vector', image: '/dashboard/tools/image-to-vector.png', keywords: 'vectorforge image to vector vector image jersey production', icon: ImageIcon, category: 'AI Powered Tools' },
+  { title: 'AutoPilot', href: '/oneclick-creation', image: '/dashboard/tools/oneclick-creation.png', keywords: 'autopilot oneclick creation automatic one click layout', icon: Sparkles, category: 'AI Powered Tools' },
+  { title: 'VectorLab', href: '/edit-existing-file', image: '/dashboard/tools/edit-existing-file.png', keywords: 'vectorlab edit existing file edit modify customize', icon: SquarePen, category: 'AI Powered Tools' },
+  { title: 'Showcase AI', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: 'showcase ai mockup generator 2d 3d mockup preview', icon: PackageOpen, category: 'AI Powered Tools' },
+  { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.svg', keywords: 'frontscan front ocr typography font analysis artwork', icon: Search, category: 'AI Powered Tools' },
+  { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.svg', keywords: 'batchforge bulk production names numbers quantity list', icon: Layers3, category: 'AI Powered Tools' },
+  { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.svg', keywords: 'ordersheet order sheet generator production list quantity sizes names', icon: FileCog, category: 'AI Powered Tools' },
+
+  { title: 'AssetForge', href: '/design-elements', image: '/dashboard/tools/design-elements.png', keywords: 'assetforge design elements logos fonts shapes patterns', icon: Layers3, category: 'Elements Tools' },
+  { title: 'DesignVault', href: '/templates', image: '/dashboard/tools/templates.png', keywords: 'designvault templates ready made jersey templates', icon: FileImage, category: 'Elements Tools' },
+  { title: 'ConvertX', href: '/file-converter', image: '/dashboard/tools/file-converter.png', keywords: 'convertx file converter svg png pdf ai eps jpg convert', icon: FileCog, category: 'Elements Tools' },
+  { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.svg', keywords: 'exportpack export system package svg ai eps pdf png production files', icon: PackageOpen, category: 'Elements Tools' },
+
+  { title: 'RescueX', href: '/backup', image: '/dashboard/tools/fallback-backup.png', keywords: 'rescuex fallback setup backup restore cloud recover', icon: ShieldCheck, category: 'Emergency Tools' },
+  { title: 'TraceDesk', href: '/manual-vector-tracing', image: '/dashboard/tools/manual-vector-tracing.svg', keywords: 'tracedesk manual vector tracing trace pen bezier paths nodes artwork', icon: SquarePen, category: 'Emergency Tools' },
+  { title: 'ColorDesk', href: '/colour-editor', image: '/dashboard/tools/colour-editor.svg', keywords: 'colordesk colour editor color palette recolor fill stroke jersey', icon: Layers3, category: 'Emergency Tools' },
+  { title: 'CutPrep', href: '/manual-production-cut-setup', image: '/dashboard/tools/manual-production-cut-setup.svg', keywords: 'cutprep manual production cut setup panels sublimation cut lines layout', icon: FileImage, category: 'Emergency Tools' },
+]
 
 const sidebarPrimary = [
   { label: 'Dashboard', href: '/', icon: Home, public: true },
   { label: 'New Project', href: '/new-project', icon: Plus },
-  { label: 'Image to Vector', href: '/image-to-vector', icon: ImageIcon },
-  { label: 'Oneclick Creation', href: '/oneclick-creation', icon: Sparkles },
-  { label: 'File Converter', href: '/file-converter', icon: FileCog },
-  { label: 'Edit Existing File', href: '/edit-existing-file', icon: SquarePen },
-];
+  { label: 'VectorForge', href: '/image-to-vector', icon: ImageIcon },
+  { label: 'AutoPilot', href: '/oneclick-creation', icon: Sparkles },
+  { label: 'VectorLab', href: '/edit-existing-file', icon: SquarePen },
+]
 
 const sidebarSecondary = [
-  { label: 'Mockup Generator', href: '/mockup-generator', icon: PackageOpen },
-  { label: 'Design Elements', href: '/design-elements', icon: Layers3 },
+  { label: 'Showcase AI', href: '/mockup-generator', icon: PackageOpen },
   { label: 'FrontScan', href: '/frontscan', icon: Search },
   { label: 'BatchForge', href: '/batchforge', icon: Layers3 },
-  { label: 'ExportPack', href: '/exportpack', icon: PackageOpen },
   { label: 'OrderSheet', href: '/ordersheet', icon: FileCog },
-  { label: 'Manual Vector Tracing', href: '/manual-vector-tracing', icon: SquarePen },
-  { label: 'Colour Editor', href: '/colour-editor', icon: Layers3 },
-  { label: 'Manual Production / Cut Setup', href: '/manual-production-cut-setup', icon: FileImage },
+  { label: 'AssetForge', href: '/design-elements', icon: Layers3 },
+  { label: 'DesignVault', href: '/templates', icon: FileImage },
+  { label: 'ConvertX', href: '/file-converter', icon: FileCog },
+  { label: 'ExportPack', href: '/exportpack', icon: PackageOpen },
+  { label: 'RescueX', href: '/backup', icon: ShieldCheck },
+  { label: 'TraceDesk', href: '/manual-vector-tracing', icon: SquarePen },
+  { label: 'ColorDesk', href: '/colour-editor', icon: Layers3 },
+  { label: 'CutPrep', href: '/manual-production-cut-setup', icon: FileImage },
   { label: 'Topup AI Credits', href: '/topup-ai-credits', icon: Coins },
   { label: 'Settings', href: '/settings', icon: Settings },
   { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
   { label: 'About Us', href: '/about-us', icon: Info },
-];
+]
 
 export function DashboardShell() {
   const session = useStudioSession();
@@ -110,6 +123,17 @@ export function DashboardShell() {
     if (!q) return tools;
     return tools.filter((tool) => `${tool.title} ${tool.keywords}`.toLowerCase().includes(q));
   }, [query]);
+
+  const groupedTools = useMemo(
+    () =>
+      categoryOrder
+        .map((category) => ({
+          category,
+          tools: filteredTools.filter((tool) => tool.category === category),
+        }))
+        .filter((group) => group.tools.length),
+    [filteredTools],
+  );
 
   const displayName = session.profile?.fullName || (session.authenticated ? 'masteradmin' : 'Guest');
   const displayRole = session.profile?.role || (session.authenticated ? 'Profile setup' : 'Not signed in');
@@ -185,7 +209,7 @@ export function DashboardShell() {
                   <input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search tools, projects, templates..."
+                    placeholder="Search VectorForge, ConvertX, tools..."
                     className={`h-13 w-full rounded-2xl border pl-12 pr-4 text-sm outline-none transition focus:border-sky-400/50 ${
                       dark ? 'border-white/10 bg-white/[0.04] text-white placeholder:text-white/35' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400'
                     }`}
@@ -324,18 +348,34 @@ export function DashboardShell() {
               </div>
 
               {filteredTools.length ? (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-                  {filteredTools.map((tool) => (
-                    <a
-                      key={tool.href}
-                      href={tool.href}
-                      onClick={(event) => featureClick(event, tool.href)}
-                      className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
-                        dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
-                      }`}
-                    >
-                      <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
-                    </a>
+                <div className="space-y-7">
+                  {groupedTools.map((group) => (
+                    <div key={group.category}>
+                      <div className="mb-3 flex items-center gap-3">
+                        <h3 className="text-lg font-black">{group.category}</h3>
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${dark ? 'bg-white/[0.05] text-white/45' : 'bg-slate-100 text-slate-500'}`}>
+                          {group.tools.length}
+                        </span>
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+                        {group.tools.map((tool) => (
+                          <a
+                            key={tool.href}
+                            href={tool.href}
+                            onClick={(event) => featureClick(event, tool.href)}
+                            className={`group overflow-hidden rounded-[26px] border transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_45px_rgba(0,0,0,.24)] ${
+                              dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'
+                            }`}
+                          >
+                            <img src={tool.image} alt={tool.title} className="aspect-square w-full object-cover" />
+                            <div className="border-t border-white/8 px-4 py-3">
+                              <div className="font-bold">{tool.title}</div>
+                              <div className={`mt-1 text-xs ${muted}`}>{tool.category}</div>
+                            </div>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -501,15 +541,6 @@ function HamburgerMenu({
               </a>
               {[
                 ['Tools', '/tools', Layers3],
-                ['Templates', '/templates', FileImage],
-                ['Design Elements', '/design-elements', Layers3],
-                ['FrontScan', '/frontscan', Search],
-                ['BatchForge', '/batchforge', Layers3],
-                ['ExportPack', '/exportpack', PackageOpen],
-                ['OrderSheet', '/ordersheet', FileCog],
-                ['Manual Vector Tracing', '/manual-vector-tracing', SquarePen],
-                ['Colour Editor', '/colour-editor', Layers3],
-                ['Manual Production / Cut Setup', '/manual-production-cut-setup', FileImage],
                 ['My Library', '/projects', ImageIcon],
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],
@@ -540,27 +571,36 @@ function HamburgerMenu({
               <h2 className="text-2xl font-black">Tools</h2>
               <span className="text-sm text-sky-400">Studio</span>
             </div>
-            <div className="space-y-2">
-              {tools.map((tool) => {
-                const Icon = tool.icon;
-                return (
-                  <a
-                    key={tool.href}
-                    href={tool.href}
-                    onClick={(event) => onFeatureClick(event, tool.href)}
-                    className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
-                      dark ? 'border-white/8 bg-white/[0.035] hover:border-sky-400/25' : 'border-slate-200 bg-slate-50 hover:border-sky-300'
-                    }`}
-                  >
-                    <img src={tool.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-semibold">{tool.title}</div>
-                      <div className={`mt-1 text-xs ${muted}`}>Open studio feature</div>
-                    </div>
-                    <Icon className="h-5 w-5 text-sky-400" />
-                  </a>
-                );
-              })}
+            <div className="space-y-5">
+              {categoryOrder.map((category) => (
+                <div key={category}>
+                  <div className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-sky-400">
+                    {category}
+                  </div>
+                  <div className="space-y-2">
+                    {tools.filter((tool) => tool.category === category).map((tool) => {
+                      const Icon = tool.icon;
+                      return (
+                        <a
+                          key={tool.href}
+                          href={tool.href}
+                          onClick={(event) => onFeatureClick(event, tool.href)}
+                          className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
+                            dark ? 'border-white/8 bg-white/[0.035] hover:border-sky-400/25' : 'border-slate-200 bg-slate-50 hover:border-sky-300'
+                          }`}
+                        >
+                          <img src={tool.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                          <div className="min-w-0 flex-1">
+                            <div className="truncate font-semibold">{tool.title}</div>
+                            <div className={`mt-1 text-xs ${muted}`}>Open {category}</div>
+                          </div>
+                          <Icon className="h-5 w-5 text-sky-400" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 

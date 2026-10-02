@@ -193,7 +193,6 @@ const sections: Section[] = [
           { label: 'Result', descriptor: true },
         ],
       },
-      { label: 'Open System Health', href: cc('system-health') },
     ],
   },
   {
@@ -317,6 +316,31 @@ export function JerseyOSControlNav({
   useEffect(() => {
     if (!drawer) window.localStorage.setItem('jerseyos_sidebar_collapsed', collapsed ? '1' : '0');
   }, [collapsed, drawer]);
+
+  useEffect(() => {
+    sections.forEach((section) => {
+      let sectionMatches = false;
+
+      section.children.forEach((node) => {
+        if (isGroup(node)) {
+          const childMatches = node.children.some((child) =>
+            Boolean(child.href && (path === child.href || (child.href !== '/' && path.startsWith(child.href + '/')))),
+          );
+
+          if (childMatches) {
+            sectionMatches = true;
+            setOpenGroups((current) => new Set(current).add(section.id + ':' + node.label));
+          }
+        } else if (node.href && (path === node.href || (node.href !== '/' && path.startsWith(node.href + '/')))) {
+          sectionMatches = true;
+        }
+      });
+
+      if (sectionMatches) {
+        setOpenSections((current) => new Set(current).add(section.id));
+      }
+    });
+  }, [path]);
 
   const mini = !drawer && collapsed;
   const shell = drawer

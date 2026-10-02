@@ -30,7 +30,7 @@ export function OneClickCreationPage() {
   const [generatedPreview, setGeneratedPreview] = useState<string>('');
   const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('png');
   const [quality, setQuality] = useState<Quality>('4k');
-  const [status, setStatus] = useState<string>('Upload a jersey image to start one-click creation.');
+  const [status, setStatus] = useState<string>('Upload a jersey image to start AutoPilot.');
   const [error, setError] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [showMasterCommand, setShowMasterCommand] = useState(false);
@@ -54,7 +54,7 @@ export function OneClickCreationPage() {
     if (!selected) {
       setFile(null);
       setInputPreview('');
-      setStatus('Upload a jersey image to start one-click creation.');
+      setStatus('Upload a jersey image to start AutoPilot.');
       return;
     }
 
@@ -87,7 +87,7 @@ export function OneClickCreationPage() {
     setError('');
 
     setStatus(
-      'Gemini 3 Pro Image is creating the OneClick production layout…',
+      'Gemini 3 Pro Image is creating the AutoPilot production layout…',
     );
 
     try {
@@ -123,13 +123,13 @@ export function OneClickCreationPage() {
       ) {
         setStatus(
           validation.valid
-            ? `OneClick complete · Cloudflare fallback · ${result.model} · validation passed.`
+            ? `AutoPilot complete · Cloudflare fallback · ${result.model} · validation passed.`
             : `Cloudflare fallback completed · ${result.model}. Review layout: ${validation.note}`,
         );
       } else {
         setStatus(
           validation.valid
-            ? 'OneClick complete · Gemini 3 Pro Image · validation passed → vector engine ready.'
+            ? 'AutoPilot complete · Gemini 3 Pro Image · validation passed → vector engine ready.'
             : `Gemini 3 Pro Image completed. Review layout before production: ${validation.note}`,
         );
       }
@@ -172,7 +172,7 @@ const handleDownload = async () => {
                   <span className="grid h-12 w-12 place-items-center rounded-2xl bg-[linear-gradient(180deg,#8347ff,#5c85ff)] shadow-[0_10px_35px_rgba(98,87,255,0.35)]">
                     ✦
                   </span>
-                  <span className="text-5xl font-bold tracking-tight text-white">OneClick Creation</span>
+                  <span className="text-5xl font-bold tracking-tight text-white">AutoPilot</span>
                 </div>
                 <p className="max-w-[920px] text-lg text-white/80">
                   Turn any jersey image into a clean, production-ready vector layout in one click.

@@ -1,4 +1,4 @@
-﻿import { ArrowLeft, ArrowRight, Bot, FileCog, Image as ImageIcon, PackageOpen, ShieldCheck, Sparkles, SquarePen } from 'lucide-react';
+﻿import { ArrowLeft, ArrowRight, FileCog, Image as ImageIcon, Layers3, PackageOpen, Search, ShieldCheck, Sparkles, SquarePen } from 'lucide-react';
 
 const tools = [
   { title: 'Image to Vector', href: '/image-to-vector', description: 'Upload a jersey, choose a production pattern, generate, customize, preview, and export.', icon: ImageIcon, active: true },
@@ -7,7 +7,10 @@ const tools = [
   { title: 'Edit Existing File', href: '/edit-existing-file', description: 'Planned editor for existing jersey artwork.', icon: SquarePen, active: false },
   { title: 'Fallback Backup', href: '/backup', description: 'Planned project backup and recovery workspace.', icon: ShieldCheck, active: false },
   { title: 'Mockup Generator', href: '/mockup-generator', description: 'Planned jersey presentation and mockup workspace.', icon: PackageOpen, active: false },
-  { title: 'AI Assistant', href: '/ai-assistant', description: 'Planned studio-wide AI helper.', icon: Bot, active: false },
+  { title: 'FrontScan', href: '/frontscan', description: 'OCR-powered front artwork scan for text, typography, placement, and production details.', icon: Search, active: false },
+  { title: 'BatchForge', href: '/batchforge', description: 'Batch production workspace for names, numbers, quantities, sizes, and repeated jersey outputs.', icon: Layers3, active: false },
+  { title: 'ExportPack', href: '/exportpack', description: 'Prepare production-ready export bundles across editable and delivery formats.', icon: PackageOpen, active: false },
+  { title: 'OrderSheet', href: '/ordersheet', description: 'Build structured production order sheets from customer and batch requirements.', icon: FileCog, active: false },
 ];
 
 export default function ToolsPage() {

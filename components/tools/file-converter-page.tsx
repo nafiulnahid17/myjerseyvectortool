@@ -355,11 +355,6 @@ export function FileConverterPage() {
                     </button>
                   ))}
                 </div>
-                {!isFormatEnabled(selectedFormat) ? (
-                  <p className="mt-3 text-sm text-amber-300">
-                    {selectedFormat.toUpperCase()} export requires the dedicated vector conversion engine and is not being faked in this build.
-                  </p>
-                ) : null}
               </div>
 
               <div className="mt-6">

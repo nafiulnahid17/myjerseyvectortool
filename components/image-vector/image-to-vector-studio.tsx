@@ -1193,6 +1193,7 @@ async function groupEditableSvg(svg: string) {
       'back-collar',
       'top-trim',
       'bottom-trim',
+      'background',
       'unassigned-artwork',
     ];
 
@@ -1225,7 +1226,9 @@ async function groupEditableSvg(svg: string) {
 
       let layer = 'unassigned-artwork';
 
-      if (cy < 0.20 && cx >= 0.32 && cx <= 0.68) {
+      if (bbox.width / width > 0.82 && bbox.height / height > 0.82) {
+        layer = 'background';
+      } else if (cy < 0.20 && cx >= 0.32 && cx <= 0.68) {
         layer = 'top-trim';
       } else if (cy > 0.78 && cx >= 0.32 && cx <= 0.68) {
         layer = 'bottom-trim';

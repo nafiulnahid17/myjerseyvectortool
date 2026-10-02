@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type DragEvent, type ReactNode } from "react";
+import { JerseyOSControlNav } from "@/components/navigation/jerseyos-control-nav";
 import styles from "./topup.module.css";
 
 type PaymentMethod = "bkash" | "nagad" | "redot" | "bank" | null;
@@ -51,6 +52,7 @@ export default function TopupAiCreditsPage() {
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [screenshotPreview, setScreenshotPreview] = useState("");
   const [message, setMessage] = useState<{ type: "error" | "info"; text: string } | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   const usd = Number(amountUsd || 0);
   const bdt = useMemo(() => {
@@ -115,29 +117,18 @@ export default function TopupAiCreditsPage() {
   return (
     <main className={styles.page}>
       <div className={styles.appShell}>
-        <aside className={styles.sidebar}>
-          <img src="/brand/jerseyos-logo.png" alt="JerseyOS" className={styles.brand} style={{ objectFit: "contain" }} />
-
-          <nav className={styles.nav}>
-            <NavItem href="/" icon="⌂">Dashboard</NavItem>
-            <NavItem href="/image-to-vector" icon="♢">AI Jersey Design</NavItem>
-            <NavItem href="/projects" icon="▣">My Designs</NavItem>
-            <NavItem href="/" icon="✓">Templates</NavItem>
-            <NavItem href="/projects" icon="⌑">My Orders</NavItem>
-            <NavItem href="/topup-ai-credits" icon="▰" active>TopUp AI Credit</NavItem>
-            <NavItem href="/topup-ai-credits" icon="≡">Transaction History</NavItem>
-            <NavItem href="/upgrade" icon="◫">Subscription</NavItem>
-            <NavItem href="/settings" icon="⚙">Settings</NavItem>
-          </nav>
-
-          <div className={styles.sidebarBottom}>
-            <img src="/topup-exact/promo-card.png" alt="Powering the future of jersey design" className={styles.promoCard} />
-            <img src="/topup-exact/ecosystem-card.png" alt="My Jersey Ecosystem" className={styles.ecosystemCard} />
-          </div>
-        </aside>
+        <JerseyOSControlNav dark />
 
         <section className={styles.workspace}>
           <header className={styles.topbar}>
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={() => setNavOpen(true)}
+              aria-label="Open JerseyOS navigation"
+            >
+              ☰
+            </button>
             <div className={styles.searchBox}>
               <span className={styles.searchIcon}>⌕</span>
               <input aria-label="Search" placeholder="Search designs, templates, or anything..." />
@@ -397,6 +388,13 @@ export default function TopupAiCreditsPage() {
             requestAnimationFrame(() => txnInput.current?.focus());
           }}
         />
+      ) : null}
+      {navOpen ? (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(2,8,18,.86)", backdropFilter: "blur(16px)" }}>
+          <div style={{ height: "100%", maxWidth: 390 }}>
+            <JerseyOSControlNav dark drawer onClose={() => setNavOpen(false)} />
+          </div>
+        </div>
       ) : null}
     </main>
   );

@@ -164,7 +164,7 @@ export function StudioSessionProvider({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-[100] grid place-items-center bg-[#020812]/95 p-6 text-white backdrop-blur-md">
           <div className="text-center">
             <img
-              src="/brand/jerseyos-logo.svg"
+              src="/brand/jerseyos-logo.png"
               alt="JerseyOS"
               className="mx-auto h-36 w-36 object-contain sm:h-44 sm:w-44"
             />
@@ -233,7 +233,7 @@ function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: ()
         </button>
         <div className="relative">
           <img
-            src="/brand/jerseyos-logo.svg"
+            src="/brand/jerseyos-logo.png"
             alt="JerseyOS"
             className="h-28 w-28 object-contain"
           />
@@ -331,7 +331,7 @@ function ProfileModal({
 
         <div className="flex items-start gap-4">
           <img
-            src="/brand/jerseyos-logo.svg"
+            src="/brand/jerseyos-logo.png"
             alt="JerseyOS"
             className="h-16 w-16 shrink-0 object-contain"
           />

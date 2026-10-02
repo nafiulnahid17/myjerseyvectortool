@@ -4,7 +4,6 @@ import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
-  Bot,
   ChevronDown,
   CircleHelp,
   Cloud,
@@ -52,8 +51,10 @@ const tools: Tool[] = [
   { title: 'Mockup Generator', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: '2d 3d mockup preview', icon: PackageOpen },
   { title: 'Templates', href: '/templates', image: '/dashboard/tools/templates.png', keywords: 'ready made jersey templates', icon: FileImage },
   { title: 'Design Elements', href: '/design-elements', image: '/dashboard/tools/design-elements.png', keywords: 'logos fonts shapes patterns', icon: Layers3 },
-  { title: 'AI Assistant', href: '/ai-assistant', image: '/dashboard/tools/ai-assistant.png', keywords: 'ai command assistant design', icon: Bot },
-  { title: 'My Projects', href: '/projects', image: '/dashboard/tools/my-projects.png', keywords: 'projects files recent saved', icon: FolderOpen },
+  { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.png', keywords: 'front scan ocr typography font analysis artwork', icon: Search },
+  { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.png', keywords: 'batch bulk production names numbers quantity list', icon: Layers3 },
+  { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.png', keywords: 'export package svg ai eps pdf png production files', icon: PackageOpen },
+  { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.png', keywords: 'order sheet production list quantity sizes names', icon: FileCog },
 ];
 
 const sidebarPrimary = [
@@ -66,10 +67,12 @@ const sidebarPrimary = [
 ];
 
 const sidebarSecondary = [
-  { label: 'My Projects', href: '/projects', icon: FolderOpen },
   { label: 'Mockup Generator', href: '/mockup-generator', icon: PackageOpen },
   { label: 'Design Elements', href: '/design-elements', icon: Layers3 },
-  { label: 'AI Assistant', href: '/ai-assistant', icon: Bot },
+  { label: 'FrontScan', href: '/frontscan', icon: Search },
+  { label: 'BatchForge', href: '/batchforge', icon: Layers3 },
+  { label: 'ExportPack', href: '/exportpack', icon: PackageOpen },
+  { label: 'OrderSheet', href: '/ordersheet', icon: FileCog },
   { label: 'Topup AI Credits', href: '/topup-ai-credits', icon: Coins },
   { label: 'Settings', href: '/settings', icon: Settings },
   { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
@@ -493,9 +496,11 @@ function HamburgerMenu({
               {[
                 ['Tools', '/tools', Layers3],
                 ['Templates', '/templates', FileImage],
-                ['Projects', '/projects', FolderOpen],
                 ['Design Elements', '/design-elements', Layers3],
-                ['AI Assistant', '/ai-assistant', Bot],
+                ['FrontScan', '/frontscan', Search],
+                ['BatchForge', '/batchforge', Layers3],
+                ['ExportPack', '/exportpack', PackageOpen],
+                ['OrderSheet', '/ordersheet', FileCog],
                 ['My Library', '/projects', ImageIcon],
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],

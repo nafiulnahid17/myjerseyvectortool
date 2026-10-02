@@ -670,7 +670,7 @@ function StudioSidebar() {
       <div className="px-2 pb-5 pt-2">
         <div className="flex items-center gap-3">
           <img
-            src="/brand/jerseyos-logo.svg"
+            src="/brand/jerseyos-logo.png"
             alt="JerseyOS"
             className="h-14 w-14 shrink-0 object-contain"
           />

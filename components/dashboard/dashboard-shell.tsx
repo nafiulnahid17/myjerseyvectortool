@@ -51,10 +51,10 @@ const tools: Tool[] = [
   { title: 'Mockup Generator', href: '/mockup-generator', image: '/dashboard/tools/mockup-generator.png', keywords: '2d 3d mockup preview', icon: PackageOpen },
   { title: 'Templates', href: '/templates', image: '/dashboard/tools/templates.png', keywords: 'ready made jersey templates', icon: FileImage },
   { title: 'Design Elements', href: '/design-elements', image: '/dashboard/tools/design-elements.png', keywords: 'logos fonts shapes patterns', icon: Layers3 },
-  { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.png', keywords: 'front scan ocr typography font analysis artwork', icon: Search },
-  { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.png', keywords: 'batch bulk production names numbers quantity list', icon: Layers3 },
-  { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.png', keywords: 'export package svg ai eps pdf png production files', icon: PackageOpen },
-  { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.png', keywords: 'order sheet production list quantity sizes names', icon: FileCog },
+  { title: 'FrontScan', href: '/frontscan', image: '/dashboard/tools/frontscan.svg', keywords: 'front scan ocr typography font analysis artwork', icon: Search },
+  { title: 'BatchForge', href: '/batchforge', image: '/dashboard/tools/batchforge.svg', keywords: 'batch bulk production names numbers quantity list', icon: Layers3 },
+  { title: 'ExportPack', href: '/exportpack', image: '/dashboard/tools/exportpack.svg', keywords: 'export package svg ai eps pdf png production files', icon: PackageOpen },
+  { title: 'OrderSheet', href: '/ordersheet', image: '/dashboard/tools/ordersheet.svg', keywords: 'order sheet production list quantity sizes names', icon: FileCog },
 ];
 
 const sidebarPrimary = [

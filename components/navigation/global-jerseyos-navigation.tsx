@@ -10,8 +10,10 @@ export function GlobalJerseyOSNavigation() {
   const session = useStudioSession();
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [path, setPath] = useState('/');
 
   useEffect(() => {
+    setPath(window.location.pathname || '/');
     const saved = window.localStorage.getItem('mj_dashboard_theme');
     if (saved === 'light' || saved === 'dark') {
       setTheme(saved);
@@ -38,6 +40,10 @@ export function GlobalJerseyOSNavigation() {
   }
 
   const dark = theme === 'dark';
+  const hasNativeDesktopSidebar =
+    path === '/' ||
+    path === '/image-to-vector' ||
+    path.startsWith('/control-center');
 
   return (
     <>
@@ -48,6 +54,7 @@ export function GlobalJerseyOSNavigation() {
         title="Open JerseyOS menu"
         className={
           'fixed left-3 top-3 z-[86] inline-flex h-12 items-center gap-2 rounded-2xl border px-3 shadow-[0_16px_45px_rgba(0,0,0,.28)] backdrop-blur-xl transition hover:-translate-y-0.5 sm:left-4 sm:top-4 ' +
+          (hasNativeDesktopSidebar ? 'xl:hidden ' : '') +
           (dark
             ? 'border-amber-300/20 bg-[#07111f]/92 text-amber-100 hover:border-amber-300/35'
             : 'border-amber-300 bg-white/94 text-slate-900 hover:border-amber-400')

@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType, ReactNode } from 'react';
+import { prepareCloudflareReferenceImage } from '@/lib/ai/cloudflare-client-image';
 import type {
   AspectRatioId,
   ExportFormat,
@@ -230,7 +231,8 @@ export function ImageToVectorStudio() {
     setPhase('generating');
 
     const customizationPrompt = mode === 'edit' ? buildCustomizationPrompt(customize, customPrompt) : '';
-    const activeFile = mode === 'edit' && generatedUrl ? await dataUrlToFile(generatedUrl, 'generated-layout.png') : sourceFile;
+    const rawActiveFile = mode === 'edit' && generatedUrl ? await dataUrlToFile(generatedUrl, 'generated-layout.png') : sourceFile;
+    const activeFile = await prepareCloudflareReferenceImage(rawActiveFile);
     const form = new FormData();
     form.append('image', activeFile, activeFile.name);
     form.append('pattern', pattern);
@@ -238,7 +240,10 @@ export function ImageToVectorStudio() {
     form.append('aspectRatio', aspectRatio);
     form.append('mode', mode);
     if (customizationPrompt) form.append('customizationPrompt', customizationPrompt);
-    if (logoFile) form.append('reference', logoFile, logoFile.name);
+    if (logoFile) {
+      const preparedLogo = await prepareCloudflareReferenceImage(logoFile);
+      form.append('reference', preparedLogo, preparedLogo.name);
+    }
 
     try {
       const response = await fetch('/api/vector-generation', { method: 'POST', body: form });
@@ -304,8 +309,8 @@ export function ImageToVectorStudio() {
                 {providerConfigured === null
                   ? 'Checking AI engineâ€¦'
                   : providerConfigured
-                    ? `OpenAI connected${providerModel ? ` Â· ${providerModel}` : ''}`
-                    : 'OpenAI image engine ready for API key'}
+                    ? `Cloudflare Workers AI connected${providerModel ? ` Â· ${providerModel}` : ''}`
+                    : 'Cloudflare Workers AI binding required'}
               </div>
               <button className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white/80">
                 <Globe className="h-4 w-4" /> English <ChevronDown className="h-4 w-4" />

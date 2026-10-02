@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
+import { prepareCloudflareReferenceImage } from '@/lib/ai/cloudflare-client-image';
 import { ONECLICK_MASTER_COMMAND } from '@/lib/tools/master-command';
 
 type DownloadFormat = 'png' | 'jpg' | 'webp' | 'pdf' | 'svg';
@@ -84,11 +85,12 @@ export function OneClickCreationPage() {
 
     setIsGenerating(true);
     setError('');
-    setStatus('Running the default master command with AI...');
+    setStatus('Running the default master command with Cloudflare Workers AI...');
 
     try {
+      const cloudflareInput = await prepareCloudflareReferenceImage(file);
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', cloudflareInput, cloudflareInput.name);
       formData.append('pattern', 'production-black');
       formData.append('quality', mapQualityToApi(quality));
       formData.append('aspectRatio', '4:3');

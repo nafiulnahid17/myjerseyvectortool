@@ -11,9 +11,9 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#020812',
     icons: [
       {
-        src: '/brand/jerseyos-logo.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/brand/jerseyos-logo.png',
+        sizes: '1254x1254',
+        type: 'image/png',
         purpose: 'any',
       },
     ],

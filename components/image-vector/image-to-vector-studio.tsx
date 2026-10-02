@@ -499,14 +499,6 @@ async function buildEditableVectorFiles() {
         <div className="min-w-0 flex-1 px-4 py-4 sm:px-6 lg:px-8">
           <header className="flex flex-wrap items-center justify-between gap-4 rounded-[24px] border border-white/10 bg-[#07111f]/90 px-4 py-3 shadow-[0_18px_60px_rgba(0,0,0,.28)] backdrop-blur-xl">
             <div className="flex min-w-0 items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setNavOpen(true)}
-                className="grid h-11 w-11 place-items-center rounded-2xl border border-white/10 bg-white/[0.03] xl:hidden"
-                aria-label="Open JerseyOS navigation"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
               <div>
                 <p className="text-sm font-medium text-sky-400">JerseyOS</p>
                 <h1 className="truncate text-lg font-bold sm:text-xl">VectorForge</h1>

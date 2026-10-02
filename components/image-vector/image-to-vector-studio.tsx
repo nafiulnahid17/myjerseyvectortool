@@ -1018,40 +1018,72 @@ function DownloadPhase(props: {
   progress: number;
   status: string;
   previewOnly: boolean;
+  format: 'svg' | 'png' | 'jpeg' | 'pdf' | 'ai' | 'eps';
+  onFormat: (format: 'svg' | 'png' | 'jpeg' | 'pdf' | 'ai' | 'eps') => void;
   onBack: () => void;
-  onDownloadSvg: () => void;
-  onDownloadAi: () => void;
+  onDownload: () => void;
 }) {
   const stages = [
-    { label: 'Prepare final artwork', threshold: 8 },
-    { label: 'Trace editable vector paths', threshold: 22 },
-    { label: 'Separate 8 jersey component groups', threshold: 58 },
-    { label: 'Prepare editable typography outlines', threshold: 78 },
-    { label: 'Build Illustrator-compatible AI file', threshold: 90 },
-    { label: 'Vector package ready', threshold: 100 },
+    { label: 'Prepare final edited artwork', threshold: 6 },
+    { label: 'Preserve / trace editable vector objects', threshold: 20 },
+    { label: 'Prepare editable SVG structure', threshold: 38 },
+    { label: 'Build editable vector PDF + AI', threshold: 54 },
+    { label: 'Build editable EPS artwork', threshold: 72 },
+    { label: 'Render PNG + JPEG', threshold: 86 },
+    { label: 'All formats ready', threshold: 100 },
   ];
+
+  const formats = [
+    { key: 'svg', title: 'SVG', note: 'Editable vector', editable: true },
+    { key: 'png', title: 'PNG', note: 'Raster image', editable: false },
+    { key: 'jpeg', title: 'JPEG', note: 'Raster image', editable: false },
+    { key: 'pdf', title: 'PDF', note: 'Editable vector PDF', editable: true },
+    { key: 'ai', title: 'AI', note: 'Illustrator-compatible vector', editable: true },
+    { key: 'eps', title: 'EPS', note: 'Editable PostScript vector', editable: true },
+  ] as const;
 
   return (
     <section className="grid gap-5 xl:grid-cols-[1fr_440px]">
-      <Panel number="5" title="Editable Vector Creation" subtitle="The final preview is converted into separately grouped editable vector artwork.">
-        <ArtworkStage url={props.outputUrl} transparent={false} previewOnly={props.previewOnly} compact />
+      <Panel
+        number="5"
+        title="Download Final Artwork"
+        subtitle="Choose PNG/JPEG for raster delivery or SVG/PDF/AI/EPS for editable vector delivery."
+      >
+        <ArtworkStage
+          url={props.outputUrl}
+          transparent={false}
+          previewOnly={props.previewOnly}
+          compact
+        />
 
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <VectorFeature title="8 Editable Groups" text="Front, back, sleeves, collars and trim pieces are organized as named groups." />
-          <VectorFeature title="Editable Paths" text="Colors, shapes, logos and typography outlines remain vector path objects." />
-          <VectorFeature title="Illustrator Ready" text="SVG opens as editable vector artwork; the AI download is Illustrator-compatible vector data." />
+          <VectorFeature
+            title="Illustrator-style Editing Preserved"
+            text="Manual vector edits, colors, positions, OCR text layers and object transforms are carried into export."
+          />
+          <VectorFeature
+            title="Editable Vector Formats"
+            text="SVG, PDF, AI and EPS are created from vector objects rather than a raster-image wrapper."
+          />
+          <VectorFeature
+            title="Raster Delivery"
+            text="PNG and JPEG are rendered from the final edited vector canvas."
+          />
         </div>
       </Panel>
 
       <div className="h-fit rounded-[28px] border border-white/10 bg-[#07111f] p-5 sm:p-6">
         {props.state === 'building' ? (
           <>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">Vector Engine</p>
-            <h2 className="mt-2 text-2xl font-black">Creating editable artwork…</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-400">Export Engine</p>
+            <h2 className="mt-2 text-2xl font-black">Preparing download formats…</h2>
             <p className="mt-3 min-h-12 text-sm leading-6 text-white/55">{props.status}</p>
 
             <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/8">
-              <div className="h-full rounded-full bg-[linear-gradient(90deg,#0875ff,#22c8ff)] transition-all duration-500" style={{ width: `${props.progress}%` }} />
+              <div
+                className="h-full rounded-full bg-[linear-gradient(90deg,#0875ff,#22c8ff)] transition-all duration-500"
+                style={{ width: String(props.progress) + '%' }}
+              />
             </div>
             <div className="mt-2 text-right text-sm font-bold text-cyan-300">{props.progress}%</div>
 
@@ -1060,11 +1092,29 @@ function DownloadPhase(props: {
                 const done = props.progress >= stage.threshold;
                 const active = !done && props.progress < stage.threshold;
                 return (
-                  <div key={stage.label} className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.025] px-4 py-3 text-sm">
-                    <span className={`grid h-7 w-7 place-items-center rounded-full ${done ? 'bg-emerald-500/15 text-emerald-300' : 'bg-sky-500/10 text-sky-300'}`}>
-                      {done ? <Check className="h-4 w-4" /> : active ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <span className="h-2 w-2 rounded-full bg-current opacity-50" />}
+                  <div
+                    key={stage.label}
+                    className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/[0.025] px-4 py-3 text-sm"
+                  >
+                    <span
+                      className={
+                        'grid h-7 w-7 place-items-center rounded-full ' +
+                        (done
+                          ? 'bg-emerald-500/15 text-emerald-300'
+                          : 'bg-sky-500/10 text-sky-300')
+                      }
+                    >
+                      {done ? (
+                        <Check className="h-4 w-4" />
+                      ) : active ? (
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <span className="h-2 w-2 rounded-full bg-current opacity-50" />
+                      )}
                     </span>
-                    <span className={done ? 'text-white/80' : 'text-white/50'}>{stage.label}</span>
+                    <span className={done ? 'text-white/80' : 'text-white/50'}>
+                      {stage.label}
+                    </span>
                   </div>
                 );
               })}
@@ -1077,32 +1127,65 @@ function DownloadPhase(props: {
                 <Check className="h-6 w-6" />
               </span>
               <div>
-                <p className="font-black text-emerald-100">Editable Vector Ready</p>
-                <p className="mt-1 text-xs text-emerald-100/60">Choose either editable delivery format below.</p>
+                <p className="font-black text-emerald-100">All Formats Ready</p>
+                <p className="mt-1 text-xs text-emerald-100/60">
+                  Choose a format below and download the prepared file.
+                </p>
               </div>
             </div>
 
-            <div className="mt-5 space-y-3">
-              <button onClick={props.onDownloadSvg} className="inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 text-base font-black">
-                <Download className="h-5 w-5" />
-                Download Editable SVG
-              </button>
-
-              <button onClick={props.onDownloadAi} className="inline-flex w-full items-center justify-center gap-3 rounded-[18px] border border-violet-400/30 bg-violet-500/10 px-5 py-4 text-base font-black text-violet-100">
-                <FileCog className="h-5 w-5" />
-                Download Editable AI File
-              </button>
+            <div className="mt-5 grid grid-cols-2 gap-2">
+              {formats.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => props.onFormat(item.key)}
+                  className={
+                    'rounded-2xl border p-3 text-left transition ' +
+                    (props.format === item.key
+                      ? 'border-sky-400 bg-sky-500/10'
+                      : 'border-white/10 bg-white/[0.025] hover:border-white/20')
+                  }
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-black">{item.title}</p>
+                    {item.editable ? (
+                      <span className="rounded-full bg-violet-500/12 px-2 py-1 text-[10px] font-bold text-violet-200">
+                        EDITABLE
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-xs text-white/45">{item.note}</p>
+                </button>
+              ))}
             </div>
 
+            <button
+              type="button"
+              onClick={props.onDownload}
+              className="mt-5 inline-flex w-full items-center justify-center gap-3 rounded-[18px] bg-[linear-gradient(90deg,#0875ff,#13a0ff)] px-5 py-4 text-base font-black"
+            >
+              {props.format === 'ai' ? (
+                <FileCog className="h-5 w-5" />
+              ) : (
+                <Download className="h-5 w-5" />
+              )}
+              Download {props.format.toUpperCase()}
+            </button>
+
             <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4 text-xs leading-6 text-white/48">
-              Typography from the raster artwork is preserved as editable vector outlines. Each letter can be selected and reshaped as vector paths. Live font-family editing requires OCR/font reconstruction and is not fabricated by this exporter.
+              OCR-created typography stays as live SVG text in SVG export. Other traced typography stays editable as vector outlines. PDF, AI and EPS preserve vector objects for compatible design software; PNG and JPEG are raster exports.
             </div>
           </>
         ) : (
-          <div className="text-sm text-white/55">Vector generation has not started.</div>
+          <div className="text-sm text-white/55">Export preparation has not started.</div>
         )}
 
-        <button onClick={props.onBack} disabled={props.state === 'building'} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 px-5 py-3 text-sm text-white/60 disabled:opacity-35">
+        <button
+          onClick={props.onBack}
+          disabled={props.state === 'building'}
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-[18px] border border-white/10 px-5 py-3 text-sm text-white/60 disabled:opacity-35"
+        >
           <ArrowLeft className="h-4 w-4" /> Back to Preview
         </button>
       </div>

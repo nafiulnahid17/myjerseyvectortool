@@ -576,9 +576,6 @@ function HamburgerMenu({
                   <a href="/backup" onClick={(event) => onFeatureClick(event, '/backup')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
                     <Cloud className="h-5 w-5" /> Cloud / Backup
                   </a>
-                  <a href="/settings" onClick={(event) => onFeatureClick(event, '/settings')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
-                    <Settings className="h-5 w-5" /> Settings
-                  </a>
                   <button onClick={onLogout} className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-left font-semibold text-red-300">
                     <LogOut className="h-5 w-5" /> Logout
                   </button>

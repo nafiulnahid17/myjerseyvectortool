@@ -30,7 +30,7 @@ export function FeatureStatusPage({
             <Construction className="h-8 w-8" />
           </div>
           <div className="mt-7 flex items-center gap-3">
-            <img src="/brand/jerseyos-logo.svg" alt="JerseyOS" className="h-14 w-14 object-contain" />
+            <img src="/brand/jerseyos-logo.png" alt="JerseyOS" className="h-14 w-14 object-contain" />
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-300">JerseyOS</p>
               <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/38">AI-Powered Jersey Production OS</p>

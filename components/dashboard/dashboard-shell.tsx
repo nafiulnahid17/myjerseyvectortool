@@ -499,11 +499,9 @@ function HamburgerMenu({
                 ['My Library', '/projects', ImageIcon],
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],
-                ['Pricing', '/upgrade', Crown],
-                ['Topup AI Credits', '/topup-ai-credits', Coins],
+                ['Credit Balance', '/topup-ai-credits', Coins],
                 ['Help & Support', '/help-support', CircleHelp],
                 ['About Us', '/about-us', Info],
-                ['Settings', '/settings', Settings],
               ].map(([label, href, Icon]) => {
                 const TypedIcon = Icon as ComponentType<{ className?: string }>;
                 return (

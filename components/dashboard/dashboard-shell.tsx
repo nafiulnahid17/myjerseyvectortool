@@ -17,8 +17,6 @@ import {
   Info,
   Image as ImageIcon,
   Layers3,
-  LogIn,
-  LogOut,
   Menu,
   Moon,
   PackageOpen,
@@ -29,7 +27,6 @@ import {
   Sparkles,
   SquarePen,
   Sun,
-  UserRound,
   X,
 } from 'lucide-react';
 import { useStudioSession } from '@/components/auth/studio-session';
@@ -103,9 +100,7 @@ export function DashboardShell() {
   const session = useStudioSession();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [query, setQuery] = useState('');
   const [languageOpen, setLanguageOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   useEffect(() => {
@@ -128,31 +123,18 @@ export function DashboardShell() {
   }, [theme]);
 
   const dark = theme === 'dark';
-  const filteredTools = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return tools;
-    return tools.filter((tool) => `${tool.title} ${tool.keywords}`.toLowerCase().includes(q));
-  }, [query]);
+  const filteredTools = tools;
 
   const groupedTools = useMemo(
     () =>
       categoryOrder
         .map((category) => ({
           category,
-          tools: filteredTools.filter((tool) => tool.category === category),
+          tools: tools.filter((tool) => tool.category === category),
         }))
         .filter((group) => group.tools.length),
-    [filteredTools],
+    [],
   );
-
-  const displayName = session.profile?.fullName || (session.authenticated ? 'masteradmin' : 'Guest');
-  const displayRole = session.profile?.role || (session.authenticated ? 'Profile setup' : 'Not signed in');
-  const initials = displayName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('') || 'MJ';
 
   function featureClick(event: ReactMouseEvent<HTMLAnchorElement>, href: string) {
     if (session.canAccessFeatures) return;
@@ -161,8 +143,6 @@ export function DashboardShell() {
   }
 
   const pageClass = dark ? 'bg-[#020812] text-white' : 'bg-[#eef4fb] text-[#0a1728]';
-  const shellClass = dark ? 'border-white/10 bg-[#030b17]/96' : 'border-slate-200 bg-white/94';
-  const sideClass = dark ? 'border-white/10 bg-[linear-gradient(180deg,#030a13,#020711)]' : 'border-slate-200 bg-[linear-gradient(180deg,#ffffff,#f5f8fc)]';
   const muted = dark ? 'text-white/55' : 'text-slate-500';
 
   return (
@@ -175,28 +155,9 @@ export function DashboardShell() {
           onNavigate={featureClick}
         />
 
-        <section className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
-          <div className={`min-h-[calc(100vh-24px)] rounded-[30px] border p-4 shadow-[0_28px_100px_rgba(0,0,0,.16)] sm:p-5 lg:p-6 ${shellClass}`}>
-            <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <img
-                  src="/brand/jerseyos-logo.png"
-                  alt="JerseyOS"
-                  className="hidden h-11 w-11 shrink-0 object-contain sm:block"
-                />
-                <div className="relative w-full max-w-[580px]">
-                  <Search className={`pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 ${muted}`} />
-                  <input
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Search VectorForge, ConvertX, tools..."
-                    className={`h-13 w-full rounded-2xl border pl-12 pr-4 text-sm outline-none transition focus:border-sky-400/50 ${
-                      dark ? 'border-white/10 bg-white/[0.04] text-white placeholder:text-white/35' : 'border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400'
-                    }`}
-                  />
-                </div>
-              </div>
-
+        <section className="min-w-0 flex-1">
+          <div className="min-h-screen px-3 pb-6 pt-4 sm:px-5 lg:px-6">
+            <header className="mb-4 flex min-h-14 items-center justify-end gap-2 pl-14 sm:pl-16 lg:pl-0">
               <div className="flex flex-wrap items-center justify-end gap-2">
                 <div className={`inline-flex rounded-2xl border p-1 ${dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-slate-50'}`}>
                   <button
@@ -227,7 +188,7 @@ export function DashboardShell() {
                   {languageOpen ? (
                     <div className={`absolute right-0 top-14 z-30 w-44 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
                       <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">English</button>
-                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">à¦¬à¦¾à¦‚à¦²à¦¾</button>
+                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">বাংলা</button>
                     </div>
                   ) : null}
                 </div>
@@ -248,41 +209,6 @@ export function DashboardShell() {
                   ) : null}
                 </div>
 
-                <div className="relative">
-                  <button
-                    onClick={() => setProfileOpen((open) => !open)}
-                    className={`flex h-12 items-center gap-3 rounded-2xl border px-2.5 pr-3 ${
-                      dark ? 'border-white/10 bg-white/[0.035]' : 'border-slate-200 bg-white'
-                    }`}
-                  >
-                    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[linear-gradient(135deg,#164d90,#0b8dff)] text-sm font-bold text-white">{initials}</span>
-                    <span className="hidden text-left sm:block">
-                      <span className="block max-w-[145px] truncate text-sm font-semibold">{displayName}</span>
-                      <span className={`block max-w-[145px] truncate text-[11px] ${muted}`}>{displayRole}</span>
-                    </span>
-                    <ChevronDown className="h-4 w-4 opacity-60" />
-                  </button>
-                  {profileOpen ? (
-                    <div className={`absolute right-0 top-14 z-30 w-64 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
-                      {session.authenticated ? (
-                        <>
-                          {!session.profile ? (
-                            <button onClick={() => session.openProfile()} className="w-full rounded-xl px-3 py-2.5 text-left text-sm hover:bg-sky-500/10">
-                              Complete profile
-                            </button>
-                          ) : null}
-                          <button onClick={() => void session.logout()} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-red-400 hover:bg-red-500/10">
-                            <LogOut className="h-4 w-4" /> Logout
-                          </button>
-                        </>
-                      ) : (
-                        <button onClick={() => session.openLogin()} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-sky-500/10">
-                          <LogIn className="h-4 w-4" /> Login
-                        </button>
-                      )}
-                    </div>
-                  ) : null}
-                </div>
               </div>
             </header>
 
@@ -331,7 +257,6 @@ export function DashboardShell() {
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-black">Tools</h2>
-                  {query ? <p className={`mt-1 text-sm ${muted}`}>{filteredTools.length} matching tool{filteredTools.length === 1 ? '' : 's'}</p> : null}
                 </div>
                 <a href="/tools" onClick={(event) => featureClick(event, '/tools')} className="text-sm font-semibold text-sky-500">View All â†’</a>
               </div>

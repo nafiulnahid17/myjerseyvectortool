@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
@@ -8,12 +8,14 @@ import {
   ChevronDown,
   CircleHelp,
   Cloud,
+  Coins,
   Crown,
   FileCog,
   FileImage,
   FolderOpen,
   Globe,
   Home,
+  Info,
   Image as ImageIcon,
   Layers3,
   LogIn,
@@ -68,8 +70,10 @@ const sidebarSecondary = [
   { label: 'Mockup Generator', href: '/mockup-generator', icon: PackageOpen },
   { label: 'Design Elements', href: '/design-elements', icon: Layers3 },
   { label: 'AI Assistant', href: '/ai-assistant', icon: Bot },
+  { label: 'Topup AI Credits', href: '/topup-ai-credits', icon: Coins },
   { label: 'Settings', href: '/settings', icon: Settings },
   { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
+  { label: 'About Us', href: '/about-us', icon: Info },
 ];
 
 export function DashboardShell() {
@@ -210,7 +214,7 @@ export function DashboardShell() {
                   {languageOpen ? (
                     <div className={`absolute right-0 top-14 z-30 w-44 rounded-2xl border p-2 shadow-2xl ${dark ? 'border-white/10 bg-[#07111f]' : 'border-slate-200 bg-white'}`}>
                       <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">English</button>
-                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">বাংলা</button>
+                      <button onClick={() => setLanguageOpen(false)} className="w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-sky-500/10">à¦¬à¦¾à¦‚à¦²à¦¾</button>
                     </div>
                   ) : null}
                 </div>
@@ -282,13 +286,13 @@ export function DashboardShell() {
                 </h1>
                 <div className="mt-5 h-1.5 w-36 rounded-full bg-[linear-gradient(90deg,#1ec8ff,#1977ff)]" />
                 <p className="mt-5 max-w-[610px] text-base leading-7 text-white/82 sm:text-lg">
-                  Turn any jersey into a production-ready design — upload, vectorize, customize, preview, and download.
+                  Turn any jersey into a production-ready design â€” upload, vectorize, customize, preview, and download.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.17em] text-white/65 sm:text-sm">
-                  <span>Upload</span><span className="text-sky-400">•</span>
-                  <span>Vectorize</span><span className="text-sky-400">•</span>
-                  <span>Customize</span><span className="text-sky-400">•</span>
-                  <span>Preview</span><span className="text-sky-400">•</span>
+                  <span>Upload</span><span className="text-sky-400">â€¢</span>
+                  <span>Vectorize</span><span className="text-sky-400">â€¢</span>
+                  <span>Customize</span><span className="text-sky-400">â€¢</span>
+                  <span>Preview</span><span className="text-sky-400">â€¢</span>
                   <span>Download</span>
                 </div>
                 <a
@@ -307,7 +311,7 @@ export function DashboardShell() {
                   <h2 className="text-2xl font-black">Tools</h2>
                   {query ? <p className={`mt-1 text-sm ${muted}`}>{filteredTools.length} matching tool{filteredTools.length === 1 ? '' : 's'}</p> : null}
                 </div>
-                <a href="/tools" onClick={(event) => featureClick(event, '/tools')} className="text-sm font-semibold text-sky-500">View All →</a>
+                <a href="/tools" onClick={(event) => featureClick(event, '/tools')} className="text-sm font-semibold text-sky-500">View All â†’</a>
               </div>
 
               {filteredTools.length ? (
@@ -337,7 +341,7 @@ export function DashboardShell() {
             <section className="mt-7">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-black">Recent Projects</h2>
-                <a href="/projects" onClick={(event) => featureClick(event, '/projects')} className="text-sm font-semibold text-sky-500">View All →</a>
+                <a href="/projects" onClick={(event) => featureClick(event, '/projects')} className="text-sm font-semibold text-sky-500">View All â†’</a>
               </div>
               <div className={`rounded-[28px] border border-dashed p-8 text-center ${dark ? 'border-white/10 bg-white/[0.02]' : 'border-slate-200 bg-slate-50'}`}>
                 <FolderOpen className="mx-auto h-10 w-10 text-sky-500" />
@@ -496,7 +500,9 @@ function HamburgerMenu({
                 ['File Manager', '/projects', FolderOpen],
                 ['Cloud Storage', '/backup', Cloud],
                 ['Pricing', '/upgrade', Crown],
+                ['Topup AI Credits', '/topup-ai-credits', Coins],
                 ['Help & Support', '/help-support', CircleHelp],
+                ['About Us', '/about-us', Info],
                 ['Settings', '/settings', Settings],
               ].map(([label, href, Icon]) => {
                 const TypedIcon = Icon as ComponentType<{ className?: string }>;
@@ -509,7 +515,7 @@ function HamburgerMenu({
                   >
                     <TypedIcon className="h-5 w-5" />
                     <span className="flex-1">{String(label)}</span>
-                    <span>›</span>
+                    <span>â€º</span>
                   </a>
                 );
               })}
@@ -591,3 +597,4 @@ function HamburgerMenu({
     </div>
   );
 }
+

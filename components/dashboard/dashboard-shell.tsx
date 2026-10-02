@@ -172,7 +172,7 @@ export function DashboardShell() {
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <button
                   onClick={() => setMenuOpen(true)}
-                  className={`grid h-13 w-13 shrink-0 place-items-center rounded-2xl border transition hover:-translate-y-0.5 ${
+                  className={`grid h-13 w-13 shrink-0 place-items-center rounded-2xl border transition hover:-translate-y-0.5 xl:hidden ${
                     dark ? 'border-sky-400/25 bg-[#07172b] text-sky-300' : 'border-sky-200 bg-sky-50 text-sky-600'
                   }`}
                   aria-label="Open hamburger menu"
@@ -417,7 +417,8 @@ export function DashboardShell() {
             />
           </div>
         </div>
-      ) : null}    </main>
+      ) : null}
+    </main>
   );
 }
 

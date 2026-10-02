@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { jsPDF } from 'jspdf';
+import { buildEditableVectorPackage, type EditableVectorPackage } from '@/lib/vector-editable-export';
 
 type FormatKey = 'png' | 'jpg' | 'svg' | 'pdf' | 'webp' | 'ai' | 'eps';
 type QualityKey = 'high' | 'medium' | 'low';
@@ -14,14 +15,24 @@ const outputFormats: { key: FormatKey; title: string; kind: string; enabled: boo
   { key: 'svg', title: 'SVG', kind: 'Vector', enabled: true },
   { key: 'pdf', title: 'PDF', kind: 'Document', enabled: true },
   { key: 'webp', title: 'WEBP', kind: 'Image', enabled: true },
-  { key: 'ai', title: 'AI', kind: 'Illustrator', enabled: false },
-  { key: 'eps', title: 'EPS', kind: 'Vector', enabled: false },
+  { key: 'ai', title: 'AI', kind: 'Illustrator', enabled: true },
+  { key: 'eps', title: 'EPS', kind: 'Vector', enabled: true },
 ];
 
 const qualityOptions: { key: QualityKey; title: string; note: string }[] = [
   { key: 'high', title: 'High', note: 'Best quality' },
   { key: 'medium', title: 'Medium', note: 'Balanced' },
   { key: 'low', title: 'Low', note: 'Small size' },
+];
+
+const vectorStages = [
+  { progress: 8, label: 'Prepare source artwork' },
+  { progress: 25, label: 'Trace editable vector paths' },
+  { progress: 55, label: 'Separate editable objects / layers' },
+  { progress: 72, label: 'Optimize vector objects' },
+  { progress: 82, label: 'Build Illustrator-compatible AI artwork' },
+  { progress: 94, label: 'Build editable EPS artwork' },
+  { progress: 100, label: 'Editable vector package ready' },
 ];
 
 export function FileConverterPage() {
@@ -37,6 +48,10 @@ export function FileConverterPage() {
   const [optimizePrint, setOptimizePrint] = useState(false);
   const [status, setStatus] = useState('Upload a file to begin conversion.');
   const [error, setError] = useState('');
+  const [vectorState, setVectorState] = useState<'idle' | 'building' | 'ready'>('idle');
+  const [vectorProgress, setVectorProgress] = useState(0);
+  const [vectorMessage, setVectorMessage] = useState('');
+  const [vectorPackage, setVectorPackage] = useState<EditableVectorPackage | null>(null);
 
   useEffect(() => {
     return () => {
@@ -49,6 +64,15 @@ export function FileConverterPage() {
     return file.type.startsWith('image/') || file.name.toLowerCase().endsWith('.svg');
   }, [file]);
 
+  const vectorSelected = isVectorFormat(selectedFormat);
+
+  useEffect(() => {
+    setVectorState('idle');
+    setVectorProgress(0);
+    setVectorMessage('');
+    setVectorPackage(null);
+  }, [file, quality, transparent, preserveLayers]);
+
   const supportedFormatsText = 'AI, SVG, EPS, PDF, PNG, JPG, JPEG, WEBP, PSD, CDR, HEIC, TIFF and more';
 
   const handlePick = (selected?: File | null) => {
@@ -57,6 +81,10 @@ export function FileConverterPage() {
       setFile(null);
       setPreviewUrl('');
       setStatus('Upload a file to begin conversion.');
+      setVectorState('idle');
+      setVectorProgress(0);
+      setVectorMessage('');
+      setVectorPackage(null);
       return;
     }
 
@@ -73,6 +101,81 @@ export function FileConverterPage() {
     setStatus('File uploaded successfully. Choose output format and download when ready.');
   };
 
+  const handleVectorAction = async () => {
+    if (!file) {
+      setError('Upload a file first.');
+      return;
+    }
+
+    if (!previewUrl || !canRenderPreview) {
+      setError(
+        'Editable SVG / AI / EPS creation currently requires a browser-renderable image or SVG source.',
+      );
+      return;
+    }
+
+    if (vectorState === 'ready' && vectorPackage) {
+      const baseName = normalizeName(file.name);
+
+      if (selectedFormat === 'svg') {
+        triggerDownload(
+          new Blob([vectorPackage.svg], {
+            type: 'image/svg+xml;charset=utf-8',
+          }),
+          baseName + '-editable.svg',
+        );
+      } else if (selectedFormat === 'ai') {
+        triggerDownload(vectorPackage.ai, baseName + '-editable.ai');
+      } else if (selectedFormat === 'eps') {
+        triggerDownload(vectorPackage.eps, baseName + '-editable.eps');
+      }
+
+      return;
+    }
+
+    setError('');
+    setVectorState('building');
+    setVectorProgress(2);
+    setVectorMessage('Starting editable vector engine...');
+    setStatus('Creating fully editable vector artwork before download.');
+
+    try {
+      const prepared = await buildEditableVectorPackage({
+        previewUrl,
+        quality,
+        transparent,
+        preserveLayers,
+        title: file.name,
+        onProgress: (progress, message) => {
+          setVectorProgress(progress);
+          setVectorMessage(message);
+        },
+      });
+
+      setVectorPackage(prepared);
+      setVectorProgress(100);
+      setVectorMessage(
+        'Editable vector package ready · ' +
+          prepared.pathCount.toLocaleString() +
+          ' individual vector objects.',
+      );
+      setVectorState('ready');
+      setStatus(
+        'Editable SVG, Illustrator-compatible AI and EPS files are ready. Click download for the selected format.',
+      );
+    } catch (vectorError) {
+      setVectorState('idle');
+      setVectorProgress(0);
+      setVectorMessage('');
+      setError(
+        vectorError instanceof Error
+          ? vectorError.message
+          : 'Editable vector creation failed.',
+      );
+      setStatus('Vector creation did not complete.');
+    }
+  };
+
   const handleDownload = async () => {
     if (!file) {
       setError('Upload a file first.');
@@ -81,52 +184,69 @@ export function FileConverterPage() {
 
     setError('');
 
-    if (!isFormatEnabled(selectedFormat)) {
-      setError(`${selectedFormat.toUpperCase()} export will be enabled after the dedicated server-side conversion engine is connected.`);
+    if (isVectorFormat(selectedFormat)) {
+      await handleVectorAction();
       return;
     }
 
     const baseName = normalizeName(file.name);
 
     if (selectedFormat === 'pdf') {
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [1400, 980] });
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [1400, 980],
+      });
+
       if (previewUrl) {
-        const dataUrl = await dataUrlFromPreview(previewUrl, quality, transparent);
+        const dataUrl = await dataUrlFromPreview(
+          previewUrl,
+          quality,
+          transparent,
+        );
         pdf.addImage(dataUrl, 'PNG', 40, 40, 1320, 900);
       } else {
         pdf.setFontSize(22);
-        pdf.text(`Converted File: ${file.name}`, 40, 60);
+        pdf.text('Converted File: ' + file.name, 40, 60);
         pdf.setFontSize(14);
-        pdf.text('Binary file attached to the workflow. Visual preview is not available in-browser for this format.', 40, 92);
+        pdf.text(
+          'Binary file attached to the workflow. Visual preview is not available in-browser for this format.',
+          40,
+          92,
+        );
       }
-      pdf.save(`${baseName}.pdf`);
+
+      pdf.save(baseName + '.pdf');
       return;
     }
 
-    if (selectedFormat === 'svg') {
-      if (file.name.toLowerCase().endsWith('.svg')) {
-        triggerDownload(file, `${baseName}.svg`);
-        return;
-      }
+    if (
+      selectedFormat === 'png' ||
+      selectedFormat === 'jpg' ||
+      selectedFormat === 'webp'
+    ) {
       if (!previewUrl) {
-        setError('SVG wrapper export requires an image preview.');
+        setError(
+          'This file type cannot be preview-converted directly in-browser.',
+        );
         return;
       }
-      const dataUrl = await dataUrlFromPreview(previewUrl, quality, transparent);
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200"><rect width="1600" height="1200" fill="${transparent ? 'transparent' : '#ffffff'}"/><image href="${dataUrl}" x="0" y="0" width="1600" height="1200" preserveAspectRatio="xMidYMid meet"/></svg>`;
-      triggerDownload(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${baseName}.svg`);
-      return;
-    }
 
-    if (selectedFormat === 'png' || selectedFormat === 'jpg' || selectedFormat === 'webp') {
-      if (!previewUrl) {
-        setError('This file type cannot be preview-converted directly in-browser.');
-        return;
-      }
-      const mime = selectedFormat === 'jpg' ? 'image/jpeg' : selectedFormat === 'webp' ? 'image/webp' : 'image/png';
-      const blob = await renderBlobFromPreview(previewUrl, mime, quality, transparent);
-      triggerDownload(blob, `${baseName}.${selectedFormat}`);
-      return;
+      const mime =
+        selectedFormat === 'jpg'
+          ? 'image/jpeg'
+          : selectedFormat === 'webp'
+            ? 'image/webp'
+            : 'image/png';
+
+      const blob = await renderBlobFromPreview(
+        previewUrl,
+        mime,
+        quality,
+        transparent,
+      );
+
+      triggerDownload(blob, baseName + '.' + selectedFormat);
     }
   };
 
@@ -318,14 +438,82 @@ export function FileConverterPage() {
                 </div>
               </div>
 
+              {vectorSelected ? (
+                <div className="mt-4 rounded-[22px] border border-sky-400/18 bg-[linear-gradient(180deg,rgba(13,68,130,.12),rgba(4,13,28,.8))] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-bold text-sky-100">Editable Vector Engine</p>
+                      <p className="mt-1 text-xs leading-5 text-white/50">
+                        The file is vectorized first. Download becomes available only after editable artwork is created.
+                      </p>
+                    </div>
+                    <span className="rounded-full border border-sky-400/20 bg-sky-500/10 px-3 py-1 text-xs font-bold text-sky-300">
+                      {selectedFormat.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {vectorState === 'building' ? (
+                    <>
+                      <div className="mt-4 h-3 overflow-hidden rounded-full bg-white/8">
+                        <div
+                          className="h-full rounded-full bg-[linear-gradient(90deg,#0875ff,#22c8ff)] transition-all duration-500"
+                          style={{ width: vectorProgress + '%' }}
+                        />
+                      </div>
+                      <div className="mt-2 flex items-center justify-between text-xs">
+                        <span className="text-white/55">{vectorMessage}</span>
+                        <span className="font-bold text-cyan-300">{vectorProgress}%</span>
+                      </div>
+
+                      <div className="mt-4 space-y-2">
+                        {vectorStages.map((stage) => {
+                          const done = vectorProgress >= stage.progress;
+                          return (
+                            <div
+                              key={stage.label}
+                              className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.025] px-3 py-2 text-xs"
+                            >
+                              <span className={done ? 'text-emerald-300' : 'text-white/30'}>
+                                {done ? '✓' : '○'}
+                              </span>
+                              <span className={done ? 'text-white/75' : 'text-white/40'}>
+                                {stage.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : vectorState === 'ready' && vectorPackage ? (
+                    <div className="mt-4 rounded-2xl border border-emerald-400/22 bg-emerald-500/8 p-4">
+                      <p className="font-bold text-emerald-200">Editable file created successfully</p>
+                      <p className="mt-1 text-xs leading-5 text-emerald-100/60">
+                        {vectorPackage.pathCount.toLocaleString()} individual vector objects are ready. Typography from raster sources is editable as vector outlines.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="mt-4 rounded-2xl border border-white/8 bg-black/20 p-3 text-xs leading-5 text-white/48">
+                      SVG, AI and EPS outputs contain real vector paths rather than an embedded raster-image wrapper.
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
               {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
 
               <button
                 type="button"
-                onClick={handleDownload}
-                className="mt-5 inline-flex w-full items-center justify-center rounded-[20px] bg-[linear-gradient(90deg,#2f7bff,#9b53ff)] px-5 py-4 text-xl font-semibold text-white shadow-[0_16px_34px_rgba(74,108,255,0.35)]"
+                onClick={() => void handleDownload()}
+                disabled={vectorState === 'building'}
+                className="mt-5 inline-flex w-full items-center justify-center rounded-[20px] bg-[linear-gradient(90deg,#2f7bff,#9b53ff)] px-5 py-4 text-xl font-semibold text-white shadow-[0_16px_34px_rgba(74,108,255,0.35)] disabled:cursor-not-allowed disabled:opacity-45"
               >
-                Download Converted File
+                {vectorSelected
+                  ? vectorState === 'building'
+                    ? 'Creating Editable Vector...'
+                    : vectorState === 'ready'
+                      ? 'Download Editable ' + selectedFormat.toUpperCase()
+                      : 'Create Editable ' + selectedFormat.toUpperCase() + ' File'
+                  : 'Download Converted File'}
               </button>
             </section>
           </div>
@@ -348,7 +536,7 @@ export function FileConverterPage() {
             <div className="rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(6,16,34,0.98),rgba(4,12,26,0.96))] p-5">
               <h3 className="text-[1.7rem] font-bold">Pro Tips</h3>
               <ul className="mt-3 space-y-2 text-sm leading-7 text-white/65">
-                <li>• Use vector formats (SVG, AI, EPS) when source vector data is available.</li>
+                <li>• SVG, AI and EPS are created as editable vector paths before download.</li>
                 <li>• Enable transparent background for PNG exports when needed.</li>
                 <li>• Keep layers if you plan to edit later.</li>
                 <li>• For printing, use high quality (300 DPI or higher).</li>
@@ -444,8 +632,8 @@ function ConverterHeroArt() {
   );
 }
 
-function isFormatEnabled(format: FormatKey) {
-  return outputFormats.find((item) => item.key === format)?.enabled ?? false;
+function isVectorFormat(format: FormatKey) {
+  return format === 'svg' || format === 'ai' || format === 'eps';
 }
 
 async function dataUrlFromPreview(previewUrl: string, quality: QualityKey, transparent: boolean) {

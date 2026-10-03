@@ -19,6 +19,11 @@
   font-family: "Aptos", "Segoe UI", sans-serif;
 }
 
+html:has(.jerseyos-landing) {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+}
+
 .jerseyos-landing *,
 .jerseyos-landing *::before,
 .jerseyos-landing *::after {
@@ -491,7 +496,7 @@
   width: auto;
   height: min(175px, 85%);
   filter: drop-shadow(0 11px 23px rgba(42, 255, 194, .19));
-  animation: hero-jersey-float 5s ease-in-out infinite;
+  animation: hero-jersey-float .7s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .hero-canvas-tag {
@@ -513,7 +518,7 @@
   height: 1px;
   background: linear-gradient(90deg, transparent, #72ffcc, transparent);
   box-shadow: 0 0 15px rgba(85, 240, 180, .58);
-  animation: hero-scan 4.8s ease-in-out infinite;
+  animation: hero-scan .9s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .hero-board-details {
@@ -644,7 +649,7 @@
   width: 14px;
   height: 14px;
   color: #68eab9;
-  animation: scroll-nudge 2s ease-in-out infinite;
+  animation: scroll-nudge .55s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .landing-content {
@@ -1034,47 +1039,49 @@
   transform: translateX(3px);
 }
 
-.jerseyos-tool-card.is-visible {
-  animation: tool-card-arrive .6s cubic-bezier(.2, .75, .2, 1) backwards;
-  animation-delay: calc(var(--card-index, 0) * 55ms);
+.jerseyos-tool-card.is-entered {
+  animation: tool-card-arrive .42s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
 .jerseyos-tool-card:not(.is-visible) .jerseyos-hero-shell *,
+.jerseyos-tool-card:not(.is-visible) .jerseyos-hero-shell::before,
+.jerseyos-tool-card:not(.is-visible) .jerseyos-hero-shell::after,
 .jerseyos-tool-card:not(.is-visible) .jerseyos-tool-art::before,
 .jerseyos-tool-card:not(.is-visible) .jerseyos-tool-art::after {
   animation-play-state: paused !important;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="vectorforge"] .jerseyos-panel-tile {
-  animation: panel-materialize 2.7s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 90ms);
+.jerseyos-tool-card.is-entered[data-visual="vectorforge"] .jerseyos-panel-tile {
+  animation: panel-materialize .48s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="vectorforge"] .jerseyos-flow-arrow,
-.jerseyos-tool-card.is-visible[data-visual="showcase"] .jerseyos-flow-arrow,
-.jerseyos-tool-card.is-visible[data-visual="exportpack"] .jerseyos-flow-arrow {
-  animation: flow-pulse 1.5s ease-in-out infinite;
+.jerseyos-tool-card.is-entered[data-visual="vectorforge"] .jerseyos-flow-arrow,
+.jerseyos-tool-card.is-entered[data-visual="showcase"] .jerseyos-flow-arrow,
+.jerseyos-tool-card.is-entered[data-visual="exportpack"] .jerseyos-flow-arrow {
+  animation: flow-pulse .4s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="autopilot"] .jerseyos-jersey-glyph,
-.jerseyos-tool-card.is-visible[data-visual="showcase"] .jerseyos-jersey-glyph {
-  animation: product-lift 3.6s ease-in-out infinite;
+.jerseyos-tool-card.is-entered[data-visual="autopilot"] .jerseyos-jersey-glyph,
+.jerseyos-tool-card.is-entered[data-visual="showcase"] .jerseyos-jersey-glyph {
+  animation: product-lift .5s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="autopilot"] .jerseyos-file-badge,
-.jerseyos-tool-card.is-visible[data-visual="batchforge"] .jerseyos-file-badge,
-.jerseyos-tool-card.is-visible[data-visual="convertx"] .jerseyos-file-badge,
-.jerseyos-tool-card.is-visible[data-visual="exportpack"] .jerseyos-file-badge,
-.jerseyos-tool-card.is-visible[data-visual="rescuex"] .jerseyos-file-badge {
-  animation: file-format-step 2.4s ease-in-out infinite;
+.jerseyos-tool-card.is-entered[data-visual="autopilot"] .jerseyos-file-badge,
+.jerseyos-tool-card.is-entered[data-visual="batchforge"] .jerseyos-file-badge,
+.jerseyos-tool-card.is-entered[data-visual="convertx"] .jerseyos-file-badge,
+.jerseyos-tool-card.is-entered[data-visual="exportpack"] .jerseyos-file-badge,
+.jerseyos-tool-card.is-entered[data-visual="rescuex"] .jerseyos-file-badge {
+  animation: file-format-step .38s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="vectorlab"] .jerseyos-hero-shell svg path {
+.jerseyos-tool-card.is-entered[data-visual="vectorlab"] .jerseyos-hero-shell svg path {
   stroke-dasharray: 120;
-  animation: vector-path-draw 3.3s ease-in-out infinite;
+  animation: vector-path-draw .65s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="frontscan"] .jerseyos-hero-shell::after {
+.jerseyos-tool-card.is-entered[data-visual="frontscan"] .jerseyos-hero-shell::after {
   position: absolute;
   z-index: 3;
   top: 0;
@@ -1082,23 +1089,18 @@
   left: 14%;
   height: 2px;
   background: linear-gradient(90deg, transparent, #6dffce, transparent);
-  box-shadow: 0 0 14px rgba(86, 248, 192, .7);
   content: "";
-  animation: card-scan 2.8s ease-in-out infinite;
+  animation: card-scan .72s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="batchforge"] .jerseyos-jersey-glyph {
-  animation: batch-arrive 2.6s ease-in-out infinite;
+.jerseyos-tool-card.is-entered[data-visual="batchforge"] .jerseyos-jersey-glyph {
+  animation: batch-arrive .46s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="ordersheet"] .jerseyos-sheet-cell span {
+.jerseyos-tool-card.is-entered[data-visual="ordersheet"] .jerseyos-sheet-cell span {
   display: block;
-  height: 3px;
-  border-radius: 5px;
-  background: linear-gradient(90deg, rgba(111, 248, 191, .18), rgba(111, 248, 191, .78), rgba(111, 248, 191, .18));
-  background-size: 200% 100%;
-  animation: sheet-sheen 2.6s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 70ms);
+  animation: data-reveal .42s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
 .jerseyos-sheet-cell span {
@@ -1108,33 +1110,33 @@
   background: rgba(111, 248, 191, .34);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="assetforge"] .jerseyos-hero-shell .grid > div {
-  animation: asset-lift 3.2s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 80ms);
+.jerseyos-tool-card.is-entered[data-visual="assetforge"] .jerseyos-hero-shell .grid > div {
+  animation: asset-lift .46s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="designvault"] .jerseyos-hero-shell .grid > div {
-  animation: vault-shift 4s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 60ms);
+.jerseyos-tool-card.is-entered[data-visual="designvault"] .jerseyos-hero-shell .grid > div {
+  animation: vault-shift .44s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="tracedesk"] .jerseyos-hero-shell svg path {
+.jerseyos-tool-card.is-entered[data-visual="tracedesk"] .jerseyos-hero-shell svg path {
   stroke-dasharray: 240;
-  animation: trace-reveal 3.1s ease-in-out infinite;
+  animation: trace-reveal .65s cubic-bezier(.16, 1, .3, 1) both;
 }
 
-.jerseyos-tool-card.is-visible[data-visual="colordesk"] .jerseyos-hero-shell .grid span {
-  animation: swatch-light 2.7s ease-in-out infinite;
-  animation-delay: calc(var(--card-index, 0) * 65ms);
+.jerseyos-tool-card.is-entered[data-visual="colordesk"] .jerseyos-hero-shell .grid span {
+  animation: data-reveal .42s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="cutprep"] .jerseyos-hero-shell .grid > div {
-  animation: cut-outline 3.8s linear infinite;
-  animation-delay: calc(var(--card-index, 0) * 65ms);
+.jerseyos-tool-card.is-entered[data-visual="cutprep"] .jerseyos-hero-shell .grid > div {
+  animation: asset-lift .46s cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 22ms);
 }
 
-.jerseyos-tool-card.is-visible[data-visual="rescuex"] .jerseyos-hero-shell > div:nth-last-child(2) {
-  animation: recovery-glow 2.4s ease-in-out infinite;
+.jerseyos-tool-card.is-entered[data-visual="rescuex"] .jerseyos-hero-shell > div:nth-last-child(2) {
+  animation: recovery-glow .45s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .landing-tool-section[data-scroll-reveal],
@@ -1144,36 +1146,31 @@
 }
 
 .landing-tool-section.is-visible {
-  animation: section-arrive .8s cubic-bezier(.16, 1, .3, 1) both;
+  animation: section-arrive .48s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 .landing-footer.is-visible {
-  animation: footer-arrive .85s cubic-bezier(.16, 1, .3, 1) both;
+  animation: footer-arrive .48s cubic-bezier(.16, 1, .3, 1) both;
 }
 
 @keyframes hero-jersey-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+  from { transform: translateY(5px); }
+  to { transform: translateY(0); }
 }
 
 @keyframes hero-scan {
-  0%, 100% { opacity: .14; transform: translateY(-30px); }
-  50% { opacity: .8; transform: translateY(95px); }
-}
-
-@keyframes robot-eye-glow {
-  0%, 100% { opacity: .9; box-shadow: 0 0 17px 4px rgba(63, 255, 220, .48); }
-  50% { opacity: 1; box-shadow: 0 0 21px 7px rgba(63, 255, 220, .72); }
+  from { opacity: .14; transform: translateY(-30px); }
+  to { opacity: .8; transform: translateY(95px); }
 }
 
 @keyframes scroll-nudge {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(4px); }
+  from { transform: translateY(4px); }
+  to { transform: translateY(0); }
 }
 
 @keyframes tool-card-arrive {
-  from { opacity: .35; transform: translateY(16px) scale(.985); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: .45; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes section-arrive {
@@ -1187,8 +1184,8 @@
 }
 
 @keyframes panel-materialize {
-  0%, 100% { opacity: .67; transform: translateY(3px) scale(.98); }
-  52% { opacity: 1; transform: translateY(-3px) scale(1); }
+  from { opacity: .55; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes flow-pulse {
@@ -1202,9 +1199,8 @@
 }
 
 @keyframes file-format-step {
-  0%, 18%, 100% { filter: brightness(.88); transform: translateY(2px); }
-  35%, 56% { filter: brightness(1.2); transform: translateY(-3px); }
-  72% { filter: brightness(.94); transform: translateY(0); }
+  from { opacity: .55; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes vector-path-draw {
@@ -1213,48 +1209,38 @@
 }
 
 @keyframes card-scan {
-  0%, 100% { opacity: .1; transform: translateY(6px); }
-  50% { opacity: .92; transform: translateY(155px); }
+  from { opacity: .1; transform: translateY(6px); }
+  to { opacity: .85; transform: translateY(145px); }
 }
 
 @keyframes batch-arrive {
-  0%, 100% { opacity: .74; transform: translateY(7px) scale(.94); }
-  55% { opacity: 1; transform: translateY(-2px) scale(1); }
-}
-
-@keyframes sheet-sheen {
-  0%, 100% { background-position: 100% 0; }
-  55% { background-position: 0 0; }
+  from { opacity: .5; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes asset-lift {
-  0%, 100% { transform: translateY(2px); }
-  50% { transform: translateY(-4px); }
+  from { opacity: .55; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes vault-shift {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  from { opacity: .65; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes trace-reveal {
-  0%, 100% { stroke-dashoffset: 200; }
-  50% { stroke-dashoffset: 0; }
-}
-
-@keyframes swatch-light {
-  0%, 100% { filter: brightness(.8) saturate(.85); }
-  50% { filter: brightness(1.2) saturate(1.15); }
-}
-
-@keyframes cut-outline {
-  to { border-color: rgba(42, 139, 234, .2); }
-  from { border-color: rgba(95, 255, 199, .95); }
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
 }
 
 @keyframes recovery-glow {
-  0%, 100% { filter: saturate(.75); transform: scale(.97); }
-  50% { filter: saturate(1.25); transform: scale(1.03); }
+  from { opacity: .65; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes data-reveal {
+  from { opacity: .45; }
+  to { opacity: 1; }
 }
 
 @media (min-width: 1500px) {
@@ -1815,6 +1801,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html:has(.jerseyos-landing) {
+    scroll-behavior: auto;
+  }
+
   .jerseyos-landing *,
   .jerseyos-landing *::before,
   .jerseyos-landing *::after {
@@ -1824,7 +1814,7 @@
     transition-duration: .01ms !important;
   }
 
-  .jerseyos-tool-card.is-visible,
+  .jerseyos-tool-card.is-entered,
   .landing-tool-section.is-visible,
   .landing-footer.is-visible {
     animation: none;

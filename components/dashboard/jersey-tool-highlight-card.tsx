@@ -1,7 +1,7 @@
 'use client';
 
 import type { ComponentType, CSSProperties, ReactNode, MouseEvent } from 'react';
-import { useEffect, useRef, useState, useId } from 'react';
+import { useEffect, useRef, useId } from 'react';
 import {
   ArrowRight,
   FileCog,
@@ -52,15 +52,18 @@ export function JerseyToolHighlightCard({
 }) {
   const Icon = tool.icon;
   const cardRef = useRef<HTMLAnchorElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const card = cardRef.current;
     if (!card) return;
 
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting);
+      (entries) => {
+        entries.forEach((entry) => {
+          const target = entry.target as HTMLAnchorElement;
+          target.classList.toggle('is-visible', entry.isIntersecting);
+          if (entry.isIntersecting) target.classList.add('is-entered');
+        });
       },
       { threshold: 0.08, rootMargin: '80px 0px' },
     );
@@ -73,7 +76,7 @@ export function JerseyToolHighlightCard({
       ref={cardRef}
       href={tool.href}
       onClick={(event) => onOpen?.(event, tool.href)}
-      className={`jerseyos-tool-card group${isVisible ? ' is-visible' : ''}`}
+      className="jerseyos-tool-card group"
       data-visual={tool.visual}
       data-card-index={index}
       style={{ '--card-index': index } as CSSProperties}

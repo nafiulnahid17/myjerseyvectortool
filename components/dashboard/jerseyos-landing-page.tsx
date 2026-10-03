@@ -1,7 +1,7 @@
 'use client';
 
 import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   ArrowDown,
   ArrowRight,
@@ -58,23 +58,6 @@ export function JerseyOSLandingPage() {
     [],
   );
 
-  useEffect(() => {
-    const targets = document.querySelectorAll<HTMLElement>('[data-scroll-reveal]');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -36px 0px' },
-    );
-
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
-  }, []);
-
   function featureClick(event: ReactMouseEvent<HTMLAnchorElement>, href: string) {
     if (session.canAccessFeatures) return;
     event.preventDefault();
@@ -83,6 +66,7 @@ export function JerseyOSLandingPage() {
 
   return (
     <main className="jerseyos-landing" id="top">
+      <a className="landing-skip-link" href="#ai-powered-tools">Skip to tools</a>
       <div className="landing-showcase">
         <header className="landing-nav">
           <Link className="landing-brand" href="/" aria-label="JerseyOS home">
@@ -176,14 +160,10 @@ export function JerseyOSLandingPage() {
           </div>
 
           <div className="landing-hero-art" aria-hidden="true">
-            <div className="hero-ambient hero-ambient-one" />
-            <div className="hero-ambient hero-ambient-two" />
-            <div className="hero-stadium-light hero-stadium-light-one" />
-            <div className="hero-stadium-light hero-stadium-light-two" />
             <div className="hero-screen">
               <div className="hero-screen-top">
                 <div className="hero-mini-brand"><JerseyOSMark /><strong>Jersey<span>OS</span></strong></div>
-                <div className="hero-search-bar"><Search aria-hidden="true" /><span>Search designs, orders, or anything...</span></div>
+                <div className="hero-search-bar"><Search aria-hidden="true" /><span>Search designs, orders, or anything…</span></div>
                 <span className="hero-screen-notification"><i /></span>
                 <span className="hero-user-avatar">J</span>
               </div>
@@ -248,7 +228,6 @@ export function JerseyOSLandingPage() {
               className={`landing-tool-section landing-tool-section-${content.id}`}
               id={content.id}
               key={group.category}
-              data-scroll-reveal
               aria-labelledby={`${content.id}-title`}
             >
               <div className="landing-section-heading">
@@ -276,7 +255,7 @@ export function JerseyOSLandingPage() {
         })}
       </div>
 
-      <footer className="landing-footer" data-scroll-reveal>
+      <footer className="landing-footer">
         <div className="landing-footer-main">
           <div className="landing-footer-brand">
             <Link className="landing-brand" href="/" aria-label="JerseyOS home">

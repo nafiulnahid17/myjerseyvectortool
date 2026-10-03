@@ -4,178 +4,16 @@ import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
-  CircleHelp,
-  Coins,
-  FileCog,
-  FileImage,
   FolderOpen,
   Globe,
-  Image as ImageIcon,
-  Layers3,
   Moon,
-  PackageOpen,
   Plus,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  SquarePen,
   Sun,
 } from 'lucide-react';
 import { useStudioSession } from '@/components/auth/studio-session';
 import { JerseyOSControlNav } from '@/components/navigation/jerseyos-control-nav';
-import { JerseyToolHighlightCard, type ToolCardModel } from '@/components/dashboard/jersey-tool-highlight-card';
-
-type ToolCategory = 'AI Powered Tools' | 'Elements Tools' | 'Emergency Tools';
-
-type Tool = ToolCardModel & {
-  category: ToolCategory;
-};
-
-const categoryOrder: ToolCategory[] = [
-  'AI Powered Tools',
-  'Elements Tools',
-  'Emergency Tools',
-];
-
-const tools: Tool[] = [
-  {
-    title: 'VectorForge',
-    href: '/image-to-vector',
-    description: 'Turn jersey inputs into separated production-ready vector panels.',
-    workflow: ['Input', 'Vectorize', 'Production Ready'],
-    visual: 'vectorforge',
-    icon: ImageIcon,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'AutoPilot',
-    href: '/oneclick-creation',
-    description: 'One-click AI workflow from upload to editable production output.',
-    workflow: ['Input', 'Oneclick', 'Editable SVG / AI File'],
-    visual: 'autopilot',
-    icon: Sparkles,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'VectorLab',
-    href: '/edit-existing-file',
-    description: 'AI-powered vector editing workspace for jersey artwork.',
-    workflow: ['Open', 'Edit', 'AI Assist', 'Export'],
-    visual: 'vectorlab',
-    icon: SquarePen,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'Showcase AI',
-    href: '/mockup-generator',
-    description: 'Transform flat jersey designs into social-ready showcase visuals.',
-    workflow: ['Input', 'Generate', 'Social Ready'],
-    visual: 'showcase',
-    icon: PackageOpen,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'FrontScan',
-    href: '/frontscan',
-    description: 'Scan front artwork, typography and measurements with precision.',
-    workflow: ['Input', 'Analyze', 'Specs', 'Download'],
-    visual: 'frontscan',
-    icon: Search,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'BatchForge',
-    href: '/batchforge',
-    description: 'Turn order data into multiple production-ready jersey files.',
-    workflow: ['Data File', 'Apply Design', 'Bulk Output'],
-    visual: 'batchforge',
-    icon: Layers3,
-    category: 'AI Powered Tools',
-  },
-  {
-    title: 'OrderSheet',
-    href: '/ordersheet',
-    description: 'Generate organized production sheets with size, name and number data.',
-    workflow: ['Order Data', 'Structure', 'Production Sheet'],
-    visual: 'ordersheet',
-    icon: FileCog,
-    category: 'AI Powered Tools',
-  },
-
-  {
-    title: 'AssetForge',
-    href: '/design-elements',
-    description: 'Create logos, fonts, patterns and jersey design elements.',
-    workflow: ['Prompt', 'Generate', 'Customize', 'Use'],
-    visual: 'assetforge',
-    icon: Layers3,
-    category: 'Elements Tools',
-  },
-  {
-    title: 'DesignVault',
-    href: '/templates',
-    description: 'Browse and reuse a premium archive of completed jersey designs.',
-    workflow: ['Browse', 'Select', 'Reuse'],
-    visual: 'designvault',
-    icon: FileImage,
-    category: 'Elements Tools',
-  },
-  {
-    title: 'ConvertX',
-    href: '/file-converter',
-    description: 'Cleanly convert design file formats for production workflows.',
-    workflow: ['Upload', 'Convert', 'Download'],
-    visual: 'convertx',
-    icon: FileCog,
-    category: 'Elements Tools',
-  },
-  {
-    title: 'ExportPack',
-    href: '/exportpack',
-    description: 'Export production designs into multiple professional formats.',
-    workflow: ['Design', 'Select Formats', 'Export Pack'],
-    visual: 'exportpack',
-    icon: PackageOpen,
-    category: 'Elements Tools',
-  },
-
-  {
-    title: 'RescueX',
-    href: '/backup',
-    description: 'Fallback recovery for rebuilding editable production files.',
-    workflow: ['Input', 'Fallback Process', 'Editable File'],
-    visual: 'rescuex',
-    icon: ShieldCheck,
-    category: 'Emergency Tools',
-  },
-  {
-    title: 'TraceDesk',
-    href: '/manual-vector-tracing',
-    description: 'Manual vector tracing for precise production artwork cleanup.',
-    workflow: ['Open', 'Trace', 'Refine', 'Export'],
-    visual: 'tracedesk',
-    icon: SquarePen,
-    category: 'Emergency Tools',
-  },
-  {
-    title: 'ColorDesk',
-    href: '/colour-editor',
-    description: 'Manual color, fill, stroke and palette control for jersey artwork.',
-    workflow: ['Open', 'Edit Colors', 'Review', 'Save'],
-    visual: 'colordesk',
-    icon: Layers3,
-    category: 'Emergency Tools',
-  },
-  {
-    title: 'CutPrep',
-    href: '/manual-production-cut-setup',
-    description: 'Manual production panel placement, cut lines and layout setup.',
-    workflow: ['Open', 'Arrange Panels', 'Set Cuts', 'Prepare'],
-    visual: 'cutprep',
-    icon: FileImage,
-    category: 'Emergency Tools',
-  },
-]
+import { JerseyToolHighlightCard } from '@/components/dashboard/jersey-tool-highlight-card';
+import { categoryOrder, jerseyTools } from '@/components/dashboard/jersey-tool-catalogue';
 
 export function DashboardShell() {
   const session = useStudioSession();
@@ -208,7 +46,7 @@ export function DashboardShell() {
       categoryOrder
         .map((category) => ({
           category,
-          tools: tools.filter((tool) => tool.category === category),
+          tools: jerseyTools.filter((tool) => tool.category === category),
         }))
         .filter((group) => group.tools.length),
     [],

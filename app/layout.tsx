@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./jerseyos-landing.css";
 import { StudioSessionProvider } from "@/components/auth/studio-session";
 import { GlobalJerseyOSNavigation } from "@/components/navigation/global-jerseyos-navigation";
 

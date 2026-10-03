@@ -1,5 +1,5 @@
-import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { JerseyOSLandingPage } from '@/components/dashboard/jerseyos-landing-page';
 
 export default function Page() {
-  return <DashboardShell />;
+  return <JerseyOSLandingPage />;
 }

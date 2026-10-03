@@ -305,9 +305,9 @@ export function DashboardShell() {
 
             <section className="relative mt-5 overflow-hidden rounded-[30px] border border-sky-400/15 bg-[#031126] shadow-[0_24px_80px_rgba(0,0,0,.28)]">
               <img
-                src="/dashboard/hero-jerseyos-suite.webp"
+                src="/dashboard/hero-jerseyos-suite.png"
                 alt="JerseyOS AI-powered jersey production operating system"
-                className="block aspect-[12/5] w-full object-cover object-center"
+                className="block aspect-[12/5] w-full object-cover object-center [image-rendering:auto]"
               />
 
               <a

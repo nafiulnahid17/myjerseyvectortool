@@ -303,45 +303,22 @@ export function DashboardShell() {
               </div>
             </header>
 
-            <section
-              className="relative mt-5 min-h-[330px] overflow-hidden rounded-[30px] border border-sky-400/15 bg-cover bg-center shadow-[0_24px_80px_rgba(0,0,0,.25)] sm:min-h-[370px]"
-              style={{ backgroundImage: "url('/dashboard/hero-stadium.png')" }}
-            >
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(1,8,19,.96)_0%,rgba(2,11,25,.86)_34%,rgba(2,11,25,.30)_64%,rgba(2,11,25,.12)_100%)]" />
-              <div className="relative z-10 max-w-[690px] p-7 sm:p-9 lg:p-11">
-                <div className="flex flex-wrap items-center gap-5">
-                  <img
-                    src="/brand/jerseyos-logo.png"
-                    alt="JerseyOS"
-                    className="h-28 w-28 shrink-0 object-contain sm:h-32 sm:w-32"
-                  />
-                  <div>
-                    <p className="text-xl italic text-white/90">Welcome To</p>
-                    <h1 className="mt-1 text-5xl font-black leading-[0.9] tracking-[0.02em] text-white sm:text-6xl lg:text-7xl">
-                      JerseyOS
-                    </h1>
-                  </div>
-                </div>
-                <div className="mt-5 h-1.5 w-36 rounded-full bg-[linear-gradient(90deg,#d6a42b,#f7df87)]" />
-                <p className="mt-5 max-w-[650px] text-base font-semibold leading-7 text-white/88 sm:text-lg">
-                  AI-Powered Full Operating System for Jersey Production
-                </p>
-                <p className="mt-2 text-sm font-medium text-amber-200/80">Owned by My Jersey</p>
-                <div className="mt-5 flex flex-wrap gap-x-3 gap-y-2 text-xs font-semibold uppercase tracking-[0.17em] text-white/65 sm:text-sm">
-                  <span>Upload</span><span className="text-sky-400">â€¢</span>
-                  <span>Vectorize</span><span className="text-sky-400">â€¢</span>
-                  <span>Customize</span><span className="text-sky-400">â€¢</span>
-                  <span>Preview</span><span className="text-sky-400">â€¢</span>
-                  <span>Download</span>
-                </div>
-                <a
-                  href="/new-project"
-                  onClick={(event) => featureClick(event, '/new-project')}
-                  className="mt-7 inline-flex items-center gap-3 rounded-full bg-[linear-gradient(90deg,#0875ff,#1babff)] px-6 py-4 font-bold text-white shadow-[0_18px_35px_rgba(8,117,255,.30)]"
-                >
-                  <Plus className="h-5 w-5" /> New Project
-                </a>
-              </div>
+            <section className="relative mt-5 overflow-hidden rounded-[30px] border border-sky-400/15 bg-[#031126] shadow-[0_24px_80px_rgba(0,0,0,.28)]">
+              <img
+                src="/dashboard/hero-jerseyos-suite.webp"
+                alt="JerseyOS AI-powered jersey production operating system"
+                className="block aspect-[12/5] w-full object-cover object-center"
+              />
+
+              <a
+                href="/tools"
+                onClick={(event) => featureClick(event, '/tools')}
+                aria-label="Explore JerseyOS tools and feel the power"
+                title="Explore → Feel The Power"
+                className="absolute left-[1.2%] top-[68%] h-[11.5%] w-[22.5%] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/80"
+              >
+                <span className="sr-only">Explore → Feel The Power</span>
+              </a>
             </section>
 
             <section className="mt-7">

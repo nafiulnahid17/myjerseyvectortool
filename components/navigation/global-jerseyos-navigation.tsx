@@ -9,7 +9,7 @@ import { useStudioSession } from '@/components/auth/studio-session';
 export function GlobalJerseyOSNavigation() {
   const session = useStudioSession();
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [path, setPath] = useState('/');
 
   useEffect(() => {
@@ -18,6 +18,9 @@ export function GlobalJerseyOSNavigation() {
     if (saved === 'light' || saved === 'dark') {
       setTheme(saved);
       document.documentElement.dataset.mjTheme = saved;
+    } else {
+      setTheme('light');
+      document.documentElement.dataset.mjTheme = 'light';
     }
   }, []);
 

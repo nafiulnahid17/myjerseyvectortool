@@ -44,7 +44,7 @@ export function FeatureStatusPage({
               <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-sky-300" />
               <div>
                 <p className="font-semibold">This route is connected.</p>
-                <p className="mt-1 text-sm leading-6 text-white/50">This module has not been filled with fake data or fake functionality. It is ready to be developed as its own update while the Image to Vector workflow remains available now.</p>
+                <p className="mt-1 text-sm leading-6 text-white/50">This module has not been filled with fake data or fake functionality. It is ready to be developed as its own update while the VectorForge workflow remains available now.</p>
               </div>
             </div>
           </div>

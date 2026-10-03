@@ -179,7 +179,7 @@ const tools: Tool[] = [
 
 export function DashboardShell() {
   const session = useStudioSession();
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
   const [language, setLanguage] = useState<'en' | 'bn'>('en');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -220,7 +220,7 @@ export function DashboardShell() {
     session.requestAccess(href);
   }
 
-  const pageClass = dark ? 'bg-[#020812] text-white' : 'bg-[#eef4fb] text-[#0a1728]';
+  const pageClass = dark ? 'bg-[#020812]/95 text-white' : 'bg-transparent text-[#0a1728]';
   const muted = dark ? 'text-white/55' : 'text-slate-500';
 
   return (
@@ -302,24 +302,6 @@ export function DashboardShell() {
 
               </div>
             </header>
-
-            <section className="relative mt-5 overflow-hidden rounded-[30px] border border-sky-400/15 bg-[#031126] shadow-[0_24px_80px_rgba(0,0,0,.28)]">
-              <img
-                src="/dashboard/hero-jerseyos-suite.png"
-                alt="JerseyOS AI-powered jersey production operating system"
-                className="block aspect-[12/5] w-full object-cover object-center [image-rendering:auto]"
-              />
-
-              <a
-                href="/tools"
-                onClick={(event) => featureClick(event, '/tools')}
-                aria-label="Explore JerseyOS tools and feel the power"
-                title="Explore → Feel The Power"
-                className="absolute left-[1.2%] top-[68%] h-[11.5%] w-[22.5%] rounded-full focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-300/80"
-              >
-                <span className="sr-only">Explore → Feel The Power</span>
-              </a>
-            </section>
 
             <section className="mt-7">
               <div className="mb-4 flex items-center justify-between gap-4">

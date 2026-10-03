@@ -1,32 +1,25 @@
 ﻿'use client';
 
-import type { ComponentType, MouseEvent as ReactMouseEvent } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Bell,
   CircleHelp,
-  Cloud,
   Coins,
-  Crown,
   FileCog,
   FileImage,
   FolderOpen,
   Globe,
-  Home,
-  Info,
   Image as ImageIcon,
   Layers3,
-  Menu,
   Moon,
   PackageOpen,
   Plus,
   Search,
-  Settings,
   ShieldCheck,
   Sparkles,
   SquarePen,
   Sun,
-  X,
 } from 'lucide-react';
 import { useStudioSession } from '@/components/auth/studio-session';
 import { JerseyOSControlNav } from '@/components/navigation/jerseyos-control-nav';
@@ -157,37 +150,9 @@ const tools: Tool[] = [
   },
 ]
 
-const sidebarPrimary = [
-  { label: 'Dashboard', href: '/', icon: Home, public: true },
-  { label: 'New Project', href: '/new-project', icon: Plus },
-  { label: 'VectorForge', href: '/image-to-vector', icon: ImageIcon },
-  { label: 'AutoPilot', href: '/oneclick-creation', icon: Sparkles },
-  { label: 'VectorLab', href: '/edit-existing-file', icon: SquarePen },
-]
-
-const sidebarSecondary = [
-  { label: 'Showcase AI', href: '/mockup-generator', icon: PackageOpen },
-  { label: 'FrontScan', href: '/frontscan', icon: Search },
-  { label: 'BatchForge', href: '/batchforge', icon: Layers3 },
-  { label: 'OrderSheet', href: '/ordersheet', icon: FileCog },
-  { label: 'AssetForge', href: '/design-elements', icon: Layers3 },
-  { label: 'DesignVault', href: '/templates', icon: FileImage },
-  { label: 'ConvertX', href: '/file-converter', icon: FileCog },
-  { label: 'ExportPack', href: '/exportpack', icon: PackageOpen },
-  { label: 'RescueX', href: '/backup', icon: ShieldCheck },
-  { label: 'TraceDesk', href: '/manual-vector-tracing', icon: SquarePen },
-  { label: 'ColorDesk', href: '/colour-editor', icon: Layers3 },
-  { label: 'CutPrep', href: '/manual-production-cut-setup', icon: FileImage },
-  { label: 'Topup AI Credits', href: '/topup-ai-credits', icon: Coins },
-  { label: 'Settings', href: '/settings', icon: Settings },
-  { label: 'Help & Support', href: '/help-support', icon: CircleHelp },
-  { label: 'About Us', href: '/about-us', icon: Info },
-]
-
 export function DashboardShell() {
   const session = useStudioSession();
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
-  const [menuOpen, setMenuOpen] = useState(false);
   const [language, setLanguage] = useState<'en' | 'bn'>('en');
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -380,7 +345,6 @@ export function DashboardShell() {
                       ))}
                     </div>
                   </div>
-                ))}                  </div>
                 ))}
               </div>
             </section>
@@ -413,20 +377,6 @@ export function DashboardShell() {
         </section>
       </div>
 
-      {menuOpen ? (
-        <div className="fixed inset-0 z-[90] bg-[#020812]/82 backdrop-blur-xl xl:hidden">
-          <div className="h-full max-w-[390px] shadow-[25px_0_80px_rgba(0,0,0,.45)]">
-            <JerseyOSControlNav
-              dark={dark}
-              drawer
-              theme={theme}
-              onThemeChange={setTheme}
-              onClose={() => setMenuOpen(false)}
-              onNavigate={featureClick}
-            />
-          </div>
-        </div>
-      ) : null}
       <style>{`
         @keyframes jerseyosToolFloat {
           0%, 100% { transform: translateY(0); }
@@ -441,223 +391,7 @@ export function DashboardShell() {
         @media (prefers-reduced-motion: reduce) {
           .jerseyos-tool-card { animation: none; }
         }
-      `}</style>   </main>
+      `}</style>
+    </main>
   );
 }
-
-function Brand({ dark }: { dark: boolean }) {
-  return (
-    <div className="flex items-center gap-3 px-2 py-2">
-      <img
-        src="/brand/jerseyos-logo.png"
-        alt="JerseyOS"
-        className="h-16 w-16 shrink-0 object-contain"
-      />
-      <div className="min-w-0">
-        <div className="text-xl font-black leading-none tracking-wide">JerseyOS</div>
-        <div className={`mt-1 max-w-[165px] text-[9px] font-semibold uppercase leading-4 tracking-[0.08em] ${dark ? 'text-amber-200/70' : 'text-amber-700'}`}>
-          AI-Powered Jersey Production OS
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function NavItem({
-  label,
-  href,
-  icon: Icon,
-  active,
-  public: isPublic,
-  dark,
-  onFeatureClick,
-}: {
-  label: string;
-  href: string;
-  icon: ComponentType<{ className?: string }>;
-  active?: boolean;
-  public?: boolean;
-  dark: boolean;
-  onFeatureClick: (event: ReactMouseEvent<HTMLAnchorElement>, href: string) => void;
-}) {
-  return (
-    <a
-      href={href}
-      onClick={isPublic ? undefined : (event) => onFeatureClick(event, href)}
-      className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 text-sm font-medium transition ${
-        active
-          ? 'border-sky-400/35 bg-[linear-gradient(90deg,rgba(8,117,255,.65),rgba(8,62,126,.48))] text-white'
-          : dark
-            ? 'border-transparent text-white/75 hover:border-white/10 hover:bg-white/[0.04] hover:text-white'
-            : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-950'
-      }`}
-    >
-      <span className={`grid h-9 w-9 place-items-center rounded-xl ${dark ? 'bg-white/[0.04]' : 'bg-slate-100'}`}>
-        <Icon className="h-4.5 w-4.5" />
-      </span>
-      {label}
-    </a>
-  );
-}
-
-function HamburgerMenu({
-  dark,
-  displayName,
-  displayRole,
-  initials,
-  authenticated,
-  profileReady,
-  onClose,
-  onFeatureClick,
-  onLogin,
-  onCompleteProfile,
-  onLogout,
-}: {
-  dark: boolean;
-  displayName: string;
-  displayRole: string;
-  initials: string;
-  authenticated: boolean;
-  profileReady: boolean;
-  onClose: () => void;
-  onFeatureClick: (event: ReactMouseEvent<HTMLAnchorElement>, href: string) => void;
-  onLogin: () => void;
-  onCompleteProfile: () => void;
-  onLogout: () => void;
-}) {
-  const panel = dark ? 'border-white/12 bg-[#05111f]/96 text-white' : 'border-slate-200 bg-white/96 text-slate-950';
-  const muted = dark ? 'text-white/55' : 'text-slate-500';
-
-  return (
-    <div className="fixed inset-0 z-[80] overflow-y-auto bg-[#020812]/86 p-3 backdrop-blur-xl sm:p-5 lg:p-7">
-      <div
-        className="pointer-events-none fixed inset-0 bg-cover bg-center opacity-25"
-        style={{ backgroundImage: "url('/dashboard/hero-stadium.png')" }}
-      />
-      <div className="relative mx-auto max-w-[1450px]">
-        <div className="mb-4 flex items-center justify-between">
-          <Brand dark />
-          <button onClick={onClose} className="grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-black/30 text-white">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr_0.8fr]">
-          <section className={`rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-2xl font-black">Menu</h2>
-              <Menu className="h-5 w-5 text-sky-400" />
-            </div>
-            <div className="space-y-1.5">
-              <a href="/" className="flex items-center gap-3 rounded-2xl bg-[#0875ff] px-4 py-3 font-semibold text-white">
-                <Home className="h-5 w-5" /> Home
-              </a>
-              {[
-                ['Tools', '/tools', Layers3],
-                ['My Library', '/projects', ImageIcon],
-                ['File Manager', '/projects', FolderOpen],
-                ['Cloud Storage', '/backup', Cloud],
-                ['Credit Balance', '/credit-balance', Coins],
-                ['Topup AI Credits', '/topup-ai-credits', Plus],
-                ['Help & Support', '/help-support', CircleHelp],
-                ['About Us', '/about-us', Info],
-              ].map(([label, href, Icon]) => {
-                const TypedIcon = Icon as ComponentType<{ className?: string }>;
-                return (
-                  <a
-                    key={String(label)}
-                    href={String(href)}
-                    onClick={(event) => onFeatureClick(event, String(href))}
-                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition hover:bg-sky-500/10 ${muted}`}
-                  >
-                    <TypedIcon className="h-5 w-5" />
-                    <span className="flex-1">{String(label)}</span>
-                    <span>â€º</span>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className={`rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-2xl font-black">Tools</h2>
-              <span className="text-sm text-sky-400">Studio</span>
-            </div>
-            <div className="space-y-5">
-              {categoryOrder.map((category) => (
-                <div key={category}>
-                  <div className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-sky-400">
-                    {category}
-                  </div>
-                  <div className="space-y-2">
-                    {tools.filter((tool) => tool.category === category).map((tool) => {
-                      const Icon = tool.icon;
-                      return (
-                        <a
-                          key={tool.href}
-                          href={tool.href}
-                          onClick={(event) => onFeatureClick(event, tool.href)}
-                          className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${
-                            dark ? 'border-white/8 bg-white/[0.035] hover:border-sky-400/25' : 'border-slate-200 bg-slate-50 hover:border-sky-300'
-                          }`}
-                        >
-                          <img src={tool.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate font-semibold">{tool.title}</div>
-                            <div className={`mt-1 text-xs ${muted}`}>Open {category}</div>
-                          </div>
-                          <Icon className="h-5 w-5 text-sky-400" />
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className={`h-fit rounded-[28px] border p-5 shadow-[0_30px_100px_rgba(0,0,0,.32)] ${panel}`}>
-            <div className="flex items-center gap-4 rounded-2xl border border-sky-400/15 bg-sky-500/[0.06] p-4">
-              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,#164d90,#0b8dff)] text-xl font-bold text-white">{initials}</span>
-              <div className="min-w-0">
-                <div className="truncate text-xl font-bold">{displayName}</div>
-                <div className={`mt-1 truncate text-sm ${muted}`}>{displayRole}</div>
-              </div>
-            </div>
-
-            <div className="mt-5 space-y-2">
-              {authenticated ? (
-                <>
-                  {!profileReady ? (
-                    <button onClick={onCompleteProfile} className="flex w-full items-center gap-3 rounded-2xl border border-sky-400/20 bg-sky-500/10 px-4 py-3 text-left font-semibold text-sky-300">
-                      <UserRound className="h-5 w-5" /> Complete Profile
-                    </button>
-                  ) : (
-                    <a href="/settings" onClick={(event) => onFeatureClick(event, '/settings')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
-                      <UserRound className="h-5 w-5" /> My Profile
-                    </a>
-                  )}
-                  <a href="/projects" onClick={(event) => onFeatureClick(event, '/projects')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
-                    <FolderOpen className="h-5 w-5" /> My Projects
-                  </a>
-                  <a href="/backup" onClick={(event) => onFeatureClick(event, '/backup')} className="flex items-center gap-3 rounded-2xl px-4 py-3 text-sm">
-                    <Cloud className="h-5 w-5" /> Cloud / Backup
-                  </a>
-                  <button onClick={onLogout} className="mt-3 flex w-full items-center gap-3 rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-left font-semibold text-red-300">
-                    <LogOut className="h-5 w-5" /> Logout
-                  </button>
-                </>
-              ) : (
-                <button onClick={onLogin} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0875ff] px-4 py-3 font-bold text-white">
-                  <LogIn className="h-5 w-5" /> Login
-                </button>
-              )}
-            </div>
-          </section>
-        </div>
-      </div>
-    </div>
-  );
-}
-

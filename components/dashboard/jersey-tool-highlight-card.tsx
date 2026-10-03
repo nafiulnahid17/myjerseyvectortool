@@ -26,6 +26,9 @@ export type ToolVisualKind =
   | 'designvault'
   | 'exportpack'
   | 'rescuex'
+  | 'tracedesk'
+  | 'colordesk'
+  | 'cutprep'
   | 'convertx';
 
 export type ToolCardModel = {
@@ -318,6 +321,56 @@ function ToolHeroVisual({ kind }: { kind: ToolVisualKind }) {
         <div className="flex gap-2">
           <FileBadge label="SVG" tone="gold" />
           <FileBadge label="AI" tone="blue" />
+        </div>
+      </HeroShell>
+    );
+  }
+
+  if (kind === 'tracedesk') {
+    return (
+      <HeroShell>
+        <div className="relative w-[86%] rounded-2xl border border-[#bdd9f4] bg-white p-4 shadow-[0_16px_30px_rgba(24,89,156,.10)]">
+          <div className="flex items-center justify-between gap-3">
+            <JerseyGlyph tone="navy" compact />
+            <div className="relative h-24 flex-1">
+              <svg viewBox="0 0 180 100" className="h-full w-full" aria-hidden="true">
+                <path d="M12 80 C40 12, 88 96, 166 20" fill="none" stroke="#1677e8" strokeWidth="4" />
+                {[12, 58, 108, 166].map((x, i) => (
+                  <circle key={x} cx={x} cy={[80,44,61,20][i]} r="6" fill="#ffffff" stroke="#d6a126" strokeWidth="3" />
+                ))}
+              </svg>
+              <SquarePen className="absolute right-0 top-0 h-5 w-5 text-[#0c70d9]" />
+            </div>
+          </div>
+        </div>
+      </HeroShell>
+    );
+  }
+
+  if (kind === 'colordesk') {
+    return (
+      <HeroShell>
+        <div className="flex items-center gap-4 rounded-2xl border border-[#bdd9f4] bg-white p-4 shadow-[0_16px_30px_rgba(24,89,156,.10)]">
+          <JerseyGlyph tone="blue" />
+          <div className="grid grid-cols-2 gap-2">
+            {['#0c8ef2', '#d8a328', '#0a2e63', '#c82e44', '#22c55e', '#a855f7'].map((color) => (
+              <span key={color} className="h-9 w-9 rounded-xl border border-white shadow-md" style={{ backgroundColor: color }} />
+            ))}
+          </div>
+        </div>
+      </HeroShell>
+    );
+  }
+
+  if (kind === 'cutprep') {
+    return (
+      <HeroShell>
+        <div className="grid grid-cols-3 gap-2 rounded-2xl border border-[#bdd9f4] bg-white p-4 shadow-[0_16px_30px_rgba(24,89,156,.10)]">
+          {['Front', 'Back', 'Sleeve', 'Sleeve', 'Collar', 'Trim'].map((label, index) => (
+            <div key={label + index} className="flex h-16 min-w-16 items-center justify-center rounded-xl border-2 border-dashed border-[#2a8bea] bg-[#f5faff] px-2 text-center text-[9px] font-black text-[#245e98]">
+              {label}
+            </div>
+          ))}
         </div>
       </HeroShell>
     );

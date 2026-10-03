@@ -20,8 +20,6 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
-  UserRound,
-  WalletCards,
   X,
 } from 'lucide-react';
 

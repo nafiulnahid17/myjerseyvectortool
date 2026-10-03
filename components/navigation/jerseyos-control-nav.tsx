@@ -145,6 +145,7 @@ const sections: Section[] = [
     children: [
       { label: 'AssetForge', href: '/design-elements' },
       { label: 'DesignVault', href: '/templates' },
+      { label: 'ConvertX', href: '/file-converter' },
       { label: 'ExportPack', href: '/exportpack' },
     ],
   },
@@ -156,7 +157,9 @@ const sections: Section[] = [
     tone: 'emergency',
     children: [
       { label: 'RescueX', href: '/backup' },
-      { label: 'ConvertX', href: '/file-converter' },
+      { label: 'TraceDesk', href: '/manual-vector-tracing' },
+      { label: 'ColorDesk', href: '/colour-editor' },
+      { label: 'CutPrep', href: '/manual-production-cut-setup' },
     ],
   },
   {

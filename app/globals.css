@@ -14,3 +14,31 @@
 @media(max-width:660px){.panel-list>button>span:nth-child(2){font-size:11px}.input-comparison figcaption{font-size:10px}.drop-zone b{font-size:14px}.helper{font-size:14px}.input-intro p{font-size:14px}.command-entry input{font-size:14px}.canvas-space{padding:20px 12px}}
 .mobile-action,.mobile-examples{display:none}
 @media(max-width:660px){.studio{padding-bottom:78px}.mobile-action{position:fixed;bottom:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--surface);border-top:1px solid var(--line);padding:11px 16px 15px;box-shadow:0 -4px 24px #141b290a}.mobile-action>span{font-size:12px;color:var(--sub);max-width:150px}.mobile-action>[data-slot=button]{font-size:13px;height:39px}.mobile-examples{display:flex;gap:12px;grid-column:span 3;justify-content:flex-start}.mobile-examples>button{font-size:11px;border:0;padding:4px 0;background:transparent;color:#315af7;text-decoration:underline;text-underline-offset:3px}}
+
+
+/* JerseyOS watercolor site background */
+html{
+  min-height:100%;
+  background:#f4fbf8;
+}
+body{
+  min-height:100vh;
+  background-color:#f4fbf8;
+  background-image:url('/backgrounds/jerseyos-watercolor-bg.webp');
+  background-repeat:no-repeat;
+  background-position:center top;
+  background-size:cover;
+  background-attachment:fixed;
+}
+html[data-mj-theme='light'] body{
+  color:#0a1728;
+}
+html[data-mj-theme='dark'] body{
+  background-color:#07111f;
+  background-image:
+    linear-gradient(rgba(2,8,18,.88),rgba(2,8,18,.88)),
+    url('/backgrounds/jerseyos-watercolor-bg.webp');
+}
+@media (max-width: 900px){
+  body{background-attachment:scroll;background-size:auto 100vh;}
+}
